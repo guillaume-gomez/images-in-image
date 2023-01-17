@@ -10,10 +10,12 @@ function UseImage(url: string) {
 
       function onload() {
         imageRef.current = img;
+        console.log("loaded " + url)
       }
 
       function onerror() {
         imageRef.current = undefined;
+        console.log("error " + url)
       }
 
       img.addEventListener('load', onload);
@@ -28,7 +30,7 @@ function UseImage(url: string) {
     },
     [url]
   );
-
+  console.log("hhh " + imageRef.current)
   return imageRef.current;
 }
 
