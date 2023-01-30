@@ -1,6 +1,8 @@
-import React, { useRef } from 'react';
+ import React, { useRef, useEffect } from 'react';
 import logo from './logo.svg';
+import useImage from "./Components/UseImage";
 import image from "./image.png";
+
 import './App.css';
 
   // prendre une image
@@ -10,11 +12,13 @@ import './App.css';
 
 const imageSize = 8;
 
-
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRefBuffer = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const black = useImage(process.env.PUBLIC_URL + "sprites/black.png");
+  const white = useImage(process.env.PUBLIC_URL + "sprites/white.png");
+
 
   function resizeImage() {
     if(imageRef.current && canvasRef.current && canvasRefBuffer.current) {
@@ -59,11 +63,13 @@ function App() {
 
       convertToGrayScale(context, expectedWidth, expectedHeight);
 
+      const canvasFinal2d = canvasRef.current.getContext("2d");
+
       for(let x=0; x < expectedWidth; x+= imageSize) {
         for(let y=0; y < expectedHeight; y+= imageSize) {
-          //const image = fromPixelColorToImage(getAveragePixel(context, x,y));
-         //contextBuffer.drawImage(image, x, y, image.width, image.height);
-          console.log(getAveragePixel(context, x,y));
+          const image = fromPixelColorToImage(getAveragePixel(context, x,y));
+          context.drawImage(image, x, y, image.width, image.height);
+          //console.log(getAveragePixel(context, x,y));
         }
       }
     }
@@ -102,17 +108,22 @@ function App() {
     return sumValue / nbPixels;
   }
 
-  function fromPixelColorToImage(greyPixelValue: number) : string {
-    return greyPixelValue > 127 ? "black.png" : "white.png"
+  function fromPixelColorToImage(greyPixelValue: number) : HTMLImageElement {
+
+    if(!black || !white) {
+      throw "error loaded stuff";
+    }
+    return greyPixelValue > 127 ? black : white;
   }
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-
         <img src={image} ref={imageRef} />
+        <h2>Guigui</h2>
         <canvas ref={canvasRef} />
+        <h2>Gaga</h2>
         <canvas ref={canvasRefBuffer} />
 
         <a
