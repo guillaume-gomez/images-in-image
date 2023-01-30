@@ -14,29 +14,18 @@ const imageSize = 8;
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasRefBuffer = useRef<HTMLCanvasElement>(null);
+  const canvasFinal = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const black = useImage(process.env.PUBLIC_URL + "sprites/black.png");
   const white = useImage(process.env.PUBLIC_URL + "sprites/white.png");
 
 
-  function resizeImage() {
-    if(imageRef.current && canvasRef.current && canvasRefBuffer.current) {
+  function generateImage() {
+    if(imageRef.current && canvasRef.current && canvasFinal.current) {
+      
       canvasRef.current.style.background = "#FF00FF";
-
-      // resize image
-      const contextBuffer = canvasRefBuffer.current.getContext("2d");
-      if(!contextBuffer) {
-        console.log("erreur context buffer");
-        return;
-      }
-
-      // resize to 50%
-      canvasRefBuffer.current.width = imageRef.current.width * 0.5;
-      canvasRefBuffer.current.height = imageRef.current.height * 0.5;
-      contextBuffer.drawImage(imageRef.current, 0, 0, canvasRefBuffer.current.width, canvasRefBuffer.current.height);
-
-      contextBuffer.drawImage(canvasRefBuffer.current, 0, 0, canvasRefBuffer.current.width * 0.5, canvasRefBuffer.current.height * 0.5);
+      canvasRef.current.width = imageRef.current.width;
+      canvasRef.current.height = imageRef.current.height;
 
       const context = canvasRef.current.getContext("2d");
       if(!context) {
@@ -44,35 +33,68 @@ function App() {
         return;
       }
 
+      context.drawImage(imageRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+
+      const canvasFinal2d = canvasFinal.current.getContext("2d");
+      if(!canvasFinal2d) {
+        console.log("erreur context buffer");
+        return;
+      }
       const expectedWidth = imageRef.current.width * imageSize;
       const expectedHeight = imageRef.current.height * imageSize;
-      canvasRef.current.width = expectedWidth;
-      canvasRef.current.height = expectedHeight;
+      canvasFinal.current.width = expectedWidth;
+      canvasFinal.current.height = expectedHeight;
+
+      convertToGrayScale(context, expectedWidth, expectedHeight);
+
+      const imageCenter = imageSize / 2;
+      for(let y = 0; y < canvasRef.current.height; ++y) {
+        for(let x = 0; x < canvasRef.current.width; ++x) {
+          const image = fromPixelColorToImage(getPixel(context, x,y));
+          canvasFinal2d.drawImage(image, x * imageSize, y * imageSize, image.width, image.height);
+        }
+      }
+
+      resizeImage(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height)
+    }
+  }
+
+  function resizeImage(originCanvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement, expectedWidth: number, expectedHeight: number) {
+    // resize image
+    const canvasBuffer = document.createElement("canvas");
+    const contextBuffer = canvasBuffer.getContext("2d");
+    if(!contextBuffer) {
+      console.log("erreur context buffer");
+      return;
+    }
+
+      // resize to 50%
+      canvasBuffer.width = originCanvas.width * 0.5;
+      canvasBuffer.height = originCanvas.height * 0.5;
+      contextBuffer.drawImage(originCanvas, 0, 0, canvasBuffer.width, canvasBuffer.height);
+
+      contextBuffer.drawImage(canvasBuffer, 0, 0, canvasBuffer.width * 0.5, canvasBuffer.height * 0.5);
+
+      const context = targetCanvas.getContext("2d");
+      if(!context) {
+        console.log("erreur context");
+        return;
+      }
+
+      targetCanvas.width = expectedWidth;
+      targetCanvas.height = expectedHeight;
 
       context.drawImage(
-        canvasRefBuffer.current,
+        canvasBuffer,
         0,
         0,
-        canvasRefBuffer.current.width * 0.5,
-        canvasRefBuffer.current.height * 0.5,
+        canvasBuffer.width * 0.5,
+        canvasBuffer.height * 0.5,
         0,
         0,
         expectedWidth,
         expectedHeight
       );
-
-      convertToGrayScale(context, expectedWidth, expectedHeight);
-
-      const canvasFinal2d = canvasRef.current.getContext("2d");
-
-      for(let x=0; x < expectedWidth; x+= imageSize) {
-        for(let y=0; y < expectedHeight; y+= imageSize) {
-          const image = fromPixelColorToImage(getAveragePixel(context, x,y));
-          context.drawImage(image, x, y, image.width, image.height);
-          //console.log(getAveragePixel(context, x,y));
-        }
-      }
-    }
   }
 
   function convertToGrayScale(context: CanvasRenderingContext2D, width: number, height: number) {
@@ -92,20 +114,11 @@ function App() {
     context.putImageData(imageData, 0, 0);
   }
 
-  function getAveragePixel(context: CanvasRenderingContext2D, x: number, y: number) : number {
-    let sumValue = 0;
-    const imageSizeMiddle = imageSize / 2;
-    const imageData = context.getImageData(x - imageSizeMiddle , y - imageSizeMiddle, imageSize, imageSize);
-    for (let i = 0; i < imageData.data.length; i += 4) {
-      sumValue += imageData.data[i];
-       // in grey not need for now
-       //imageData.data[i] = gray;
-       //imageData.data[i + 1] = gray;
-       //imageData.data[i + 2] = gray;
-       //imageData.data[i + 3] = 255;
-    }
-    const nbPixels = imageData.data.length / 4;
-    return sumValue / nbPixels;
+  function getPixel(context: CanvasRenderingContext2D, x: number, y: number) : number {
+    const pixel = context.getImageData(x, y, 1, 1);
+    const { data } = pixel;
+    // only grey for now. So three components (R,G,B) have the same value
+    return data[0];
   }
 
   function fromPixelColorToImage(greyPixelValue: number) : HTMLImageElement {
@@ -113,7 +126,7 @@ function App() {
     if(!black || !white) {
       throw "error loaded stuff";
     }
-    return greyPixelValue > 127 ? black : white;
+    return greyPixelValue < 127 ? black : white;
   }
 
   return (
@@ -124,11 +137,10 @@ function App() {
         <h2>Guigui</h2>
         <canvas ref={canvasRef} />
         <h2>Gaga</h2>
-        <canvas ref={canvasRefBuffer} />
-
+        <canvas ref={canvasFinal} />
         <a
           className="App-link"
-          onClick={resizeImage}
+          onClick={generateImage}
         >
           Ahhhh Click
         </a>
