@@ -17,6 +17,7 @@ function App() {
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const black = useImage(process.env.PUBLIC_URL + "sprites/black.png");
+  const grey = useImage(process.env.PUBLIC_URL + "sprites/grey.png");
   const white = useImage(process.env.PUBLIC_URL + "sprites/white.png");
 
 
@@ -123,10 +124,21 @@ function App() {
 
   function fromPixelColorToImage(greyPixelValue: number) : HTMLImageElement {
 
-    if(!black || !white) {
+    if(!black || !white || !grey) {
       throw "error loaded stuff";
     }
-    return greyPixelValue < 127 ? black : white;
+
+    if(greyPixelValue > 0 && greyPixelValue <= 50) {
+      return black;
+    }
+    else if(greyPixelValue > 50 && greyPixelValue <= 100) {
+      return grey;
+    }
+    else {
+      return white;
+    }
+
+    //return greyPixelValue < 127 ? black : white;
   }
 
   return (
