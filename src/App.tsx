@@ -1,25 +1,36 @@
- import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { minBy } from "lodash";
 import logo from './logo.svg';
 import useImage from "./Components/UseImage";
 import image from "./image.png";
 
 import './App.css';
 
-  // prendre une image
-  // la rescale pour que ca marche avec le "pixel image"
-  // et ensuite faire une detection moyenné de l'image
-  // remplacer ce pixel moyenne par l'image associé correspondant à la couleur
-
 const imageSize = 8;
+////////////////////
+//red = 255 * 100
+//green = 255 * 10
+//blue = 255;
+////////////////////
+const picturesData = {
+  0: "black",
+  255: "blue",
+  2550: "green",
+  25500: "red",
+  28305: "white",
+}
+
+const picturesRange = [0, 255, 2550, 25500, 28305];
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const black = useImage(process.env.PUBLIC_URL + "sprites/black.png");
-  const grey = useImage(process.env.PUBLIC_URL + "sprites/grey.png");
   const white = useImage(process.env.PUBLIC_URL + "sprites/white.png");
-
+  const red = useImage(process.env.PUBLIC_URL + "sprites/red.png");
+  const green = useImage(process.env.PUBLIC_URL + "sprites/green.png");
+  const blue = useImage(process.env.PUBLIC_URL + "sprites/blue.png");
 
   function generateImage() {
     if(imageRef.current && canvasRef.current && canvasFinal.current) {
@@ -119,26 +130,17 @@ function App() {
     const pixel = context.getImageData(x, y, 1, 1);
     const { data } = pixel;
     // only grey for now. So three components (R,G,B) have the same value
-    return data[0];
+    return (data[0] * 100) + (data[1] * 10) + data[0];
   }
 
-  function fromPixelColorToImage(greyPixelValue: number) : HTMLImageElement {
+  function fromPixelColorToImage(pixelValue: number) : HTMLImageElement {
 
-    if(!black || !white || !grey) {
+    if(!black || !white || !red || !green || !blue) {
       throw "error loaded stuff";
     }
-
-    if(greyPixelValue > 0 && greyPixelValue <= 50) {
-      return black;
-    }
-    else if(greyPixelValue > 50 && greyPixelValue <= 100) {
-      return grey;
-    }
-    else {
-      return white;
-    }
-
-    //return greyPixelValue < 127 ? black : white;
+    const comparaisonValues = picturesRange.map(value => ({ [value]: Math.abs(pixelValue - value) }) );
+    // find the smallest value to get the key
+    return pixelValue < 127 ? black : white;
   }
 
   return (
