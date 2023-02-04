@@ -12,15 +12,13 @@ const imageSize = 8;
 //green = 255 * 10
 //blue = 255;
 ////////////////////
-const picturesData = {
-  0: "black",
-  255: "blue",
-  2550: "green",
-  25500: "red",
-  28305: "white",
-}
-
-const picturesRange = [0, 255, 2550, 25500, 28305];
+const picturesData = [
+  {value: 0, sprite: "black"},
+  {value: 255, sprite: "blue"},
+  {value: 2550, sprite: "green"},
+  {value: 25500, sprite: "red"},
+  {value: 28305, sprite: "white"},
+]
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
