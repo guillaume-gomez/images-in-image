@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { minBy } from "lodash";
 import logo from './logo.svg';
 import useImage from "./Components/UseImage";
-import image from "./image.png";
+import image from "./image1.png";
 
 import './App.css';
 
