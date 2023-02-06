@@ -74,7 +74,7 @@ function App() {
     const canvasBuffer = document.createElement("canvas");
     const contextBuffer = canvasBuffer.getContext("2d");
     if(!contextBuffer) {
-      console.log("erreur context buffer");
+      throw "Error : context buffer not found";
       return;
     }
 
@@ -87,7 +87,7 @@ function App() {
 
       const context = targetCanvas.getContext("2d");
       if(!context) {
-        console.log("erreur context");
+        throw "Error: context not found";
         return;
       }
 
