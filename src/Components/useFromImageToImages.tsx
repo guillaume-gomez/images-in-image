@@ -29,8 +29,7 @@ interface fromImageToImagesInterface {
 
 export default function useFromImageToImages({ picturesData, imageSize = imageSizeDefault } : fromImageToImagesInterface) {
 
-  console.log(picturesData)
-
+  
   function generateImage(image: HTMLImageElement, canvasTarget: HTMLCanvasElement) {
       const canvasBuffer = document.createElement("canvas");
       canvasBuffer.width = image.width;
