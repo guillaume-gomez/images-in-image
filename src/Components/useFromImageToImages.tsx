@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { minBy } from "lodash";
 
 const imageSizeDefault = 32;
@@ -120,6 +120,11 @@ export default function useFromImageToImages({ picturesData, imageSize = imageSi
       throw new Error("Cannot find the sprite");
     }
     return foundPixel.sprite;
+  }
+
+  function interpolate(context: CanvasRenderingContext2D) {
+    // todo
+    // pack pixels by area to resize the number of images to generate for the image
   }
 
   /*
