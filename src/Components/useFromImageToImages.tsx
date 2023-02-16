@@ -53,7 +53,6 @@ export default function useFromImageToImages({ picturesData, imageSize = imageSi
 
       //convertToGrayScale(context, expectedWidth, expectedHeight);
 
-      const imageCenter = imageSize / 2;
       for(let y = 0; y < canvasBuffer.height; ++y) {
         for(let x = 0; x < canvasBuffer.width; ++x) {
           const image = fromPixelColorToImage(getPixel(context, x,y));
@@ -122,9 +121,29 @@ export default function useFromImageToImages({ picturesData, imageSize = imageSi
     return foundPixel.sprite;
   }
 
-  function interpolate(context: CanvasRenderingContext2D) {
-    // todo
-    // pack pixels by area to resize the number of images to generate for the image
+  function interpolate(image: HTMLImageElement, pixelSize: number, width: number, height: number) {
+    /*for(let y = 0; y < canvasBuffer.height; ++y) {
+        for(let x = 0; x < canvasBuffer.width; ++x) {
+          const image = fromPixelColorToImage(interpolateArea(context,pixelSize, x,y));
+          canvasTargetContext.drawImage(image, x * imageSize, y * imageSize, image.width, image.height);
+        }
+      }*/
+  }
+
+  function interpolateArea(context: CanvasRenderingContext2D, pixelSize: number, x: number, y: number) : number {
+    const pixels = context.getImageData(x,y, pixelSize, pixelSize);
+    const { data } = pixels;
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      red += data[i];
+      green += data[i + 1];
+      blue += data[i + 2];
+    }
+
+    return ((red/data.length) * 100) + ((green/data.length) * 10) + (blue/data.length);
   }
 
   /*
@@ -147,5 +166,5 @@ export default function useFromImageToImages({ picturesData, imageSize = imageSi
     context.putImageData(imageData, 0, 0);
   }
 
-  return { generateImage, resizeImage };
+  return { generateImage, resizeImage, interpolate };
 }
