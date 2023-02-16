@@ -29,32 +29,38 @@ interface fromImageToImagesInterface {
 
 export default function useFromImageToImages({ picturesData, imageSize = imageSizeDefault } : fromImageToImagesInterface) {
 
-  
+  function init(image: HTMLImageElement, canvasTarget: HTMLCanvasElement, imageSize: number) : [CanvasRenderingContext2D, CanvasRenderingContext2D] {
+    const canvasBuffer = document.createElement("canvas");
+    canvasBuffer.width = image.width;
+    canvasBuffer.height = image.height;
+
+    const context = canvasBuffer.getContext("2d");
+    if(!context) {
+      throw new Error("cannot find the context");
+    }
+
+    context.drawImage(image, 0, 0, canvasBuffer.width, canvasBuffer.height);
+
+    const canvasTargetContext = canvasTarget.getContext("2d");
+    if(!canvasTargetContext) {
+      throw new Error("cannot find the context");
+    }
+    const expectedWidth = image.width * imageSize;
+    const expectedHeight = image.height * imageSize;
+    canvasTarget.width = expectedWidth;
+    canvasTarget.height = expectedHeight;
+
+    return [canvasTargetContext, context];
+  }
+
+
   function generateImage(image: HTMLImageElement, canvasTarget: HTMLCanvasElement) {
-      const canvasBuffer = document.createElement("canvas");
-      canvasBuffer.width = image.width;
-      canvasBuffer.height = image.height;
-
-      const context = canvasBuffer.getContext("2d");
-      if(!context) {
-        throw new Error("cannot find the context");
-      }
-
-      context.drawImage(image, 0, 0, canvasBuffer.width, canvasBuffer.height);
-
-      const canvasTargetContext = canvasTarget.getContext("2d");
-      if(!canvasTargetContext) {
-        throw new Error("cannot find the context");
-      }
-      const expectedWidth = image.width * imageSize;
-      const expectedHeight = image.height * imageSize;
-      canvasTarget.width = expectedWidth;
-      canvasTarget.height = expectedHeight;
+      const [canvasTargetContext, context] = init(image, canvasTarget, imageSize);
 
       //convertToGrayScale(context, expectedWidth, expectedHeight);
 
-      for(let y = 0; y < canvasBuffer.height; ++y) {
-        for(let x = 0; x < canvasBuffer.width; ++x) {
+      for(let y = 0; y < image.height; ++y) {
+        for(let x = 0; x < image.width; ++x) {
           const image = fromPixelColorToImage(getPixel(context, x,y));
           canvasTargetContext.drawImage(image, x * imageSize, y * imageSize, image.width, image.height);
         }
