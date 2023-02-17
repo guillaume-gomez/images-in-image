@@ -72,7 +72,7 @@ function App() {
     <div className="flex flex-col gap-8 items-center">
        <Header />
        <h1 className="text-3xl font-bold underline text-primary">
-        Hello Alice!
+        Hello Michel!
        </h1>
         <img src={image} ref={imageRef} />
         <canvas ref={canvasRef} />
