@@ -48,6 +48,13 @@ interface fromImageToImagesInterface {
 
 }
 
+
+
+
+//TODO
+// interdire les images qui ont une composante plus petite que le imageSize
+
+
 export default function useFromImageToImages({ picturesData, imageSize = imageSizeDefault } : fromImageToImagesInterface) {
 
   function init(image: HTMLImageElement, canvasTarget: HTMLCanvasElement, imageSize: number) : [CanvasRenderingContext2D, CanvasRenderingContext2D] {
@@ -149,6 +156,23 @@ export default function useFromImageToImages({ picturesData, imageSize = imageSi
   }
 
   function interpolate(image: HTMLImageElement, pixelSize: number, width: number, height: number) {
+    // resize l'image pour etre sur que la taille de l'image fit les images
+    const {width: imageWidth, height: imageHeight } = image;
+
+
+
+    // soit x = width de l'image
+    // soit y = height de l'image
+    // soit c = la taille du sprite (spriteSize)
+
+    // il faut trouver le pgcd de x et y qui donne d
+    // faire (x/d)*c = xx ET (y/d)*c = yy
+    // faire ceil(xx) = xxx ou ceil(yy) = yyy ==> meme resultat
+
+    //image de taille finale est
+    // x2 = xxx * xx
+    // y2 = yyy * yy
+
     /*for(let y = 0; y < canvasBuffer.height; ++y) {
         for(let x = 0; x < canvasBuffer.width; ++x) {
           const image = fromPixelColorToImage(interpolateArea(context,pixelSize, x,y));
