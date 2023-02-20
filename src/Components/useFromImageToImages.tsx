@@ -45,17 +45,20 @@ interface pictureData {
 interface fromImageToImagesInterface {
   picturesData: pictureData[];
   pixelSize?: number;
-
 }
 
 
+interface ImageDataInterface {
+  image: HTMLImageElement;
+  x: number;
+  y: number;
+}
 
 
 //TODO
 // interdire les images qui ont une composante plus petite que le pixelSize
-
-
 export default function useFromImageToImages({ picturesData, pixelSize = pixelSizeDefault } : fromImageToImagesInterface) {
+  const [imagesData, setImagesData] = useState<ImageDataInterface[]>([]);
 
   function init(image: HTMLImageElement, canvasTarget: HTMLCanvasElement, pixelSize: number) : [CanvasRenderingContext2D, CanvasRenderingContext2D] {
     const canvasBuffer = document.createElement("canvas");
@@ -86,15 +89,23 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
       const [canvasTargetContext, context] = init(image, canvasTarget, pixelSize);
 
       //convertToGrayScale(context, expectedWidth, expectedHeight);
-
+      let imagesData = [];
       for(let y = 0; y < image.height; ++y) {
         for(let x = 0; x < image.width; ++x) {
           const image = fromPixelColorToImage(getPixel(context, x,y));
           canvasTargetContext.drawImage(image, x * pixelSize, y * pixelSize, image.width, image.height);
+          imagesData.push({image, x, y });
         }
       }
+      setImagesData(imagesData);
 
       //resizeImage(canvasTarget, canvasBuffer, image.width, image.height)
+  }
+
+  function render(canvasTargetContext: CanvasRenderingContext2D) {
+    imagesData.map(({image, x, y}) => {
+      canvasTargetContext.drawImage(image, x * pixelSize, y * pixelSize, image.width, image.height)
+    });
   }
 
   function resizeImage(originCanvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement, expectedWidth: number, expectedHeight: number) {
