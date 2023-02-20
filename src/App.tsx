@@ -52,11 +52,8 @@ function App() {
       resizeImage(canvasFinal.current, canvasFinal.current, width, height);
 
       setRatio(newRatio);
-      
-      console.log("je passe la")
+
     }
-    //setWidth(width);
-    //setHeight(height);
   }
 
   function saveImage() {

@@ -26,11 +26,11 @@ function pgcd(a: number, b: number) : number {
     }
 
     while (true) {
-      if (b == 0) {
+      if (b === 0) {
         return a;
       }
       a %= b;
-      if (a == 0) {
+      if (a === 0) {
         return b;
       }
       b %= a;
@@ -238,5 +238,5 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
     context.putImageData(imageData, 0, 0);
   }
 
-  return { generateImage, resizeImage, optimizedResize };
+  return { generateImage, resizeImage, optimizedResize, render };
 }
