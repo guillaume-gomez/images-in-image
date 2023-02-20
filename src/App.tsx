@@ -31,11 +31,12 @@ function App() {
     {value: 28305, sprite: white},
   ]
 
-  const { generateImage, resizeImage} = useFromImageToImages({picturesData, imageSize: 32});
+  const { generateImage, resizeImage, optimizedResize } = useFromImageToImages({picturesData, pixelSize: 32});
 
   function onClick() {
     if(imageRef.current && canvasFinal.current && canvasRef.current) {
       generateImage(imageRef.current, canvasFinal.current);
+      optimizedResize(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height);
       resizeImage(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height);
     }
   }
