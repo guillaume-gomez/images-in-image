@@ -82,8 +82,9 @@ function App() {
         >
           Click pour generer l'image wesh !
         </button>
-        <canvas ref={canvasFinal} style={{ background: "red"}}/>
-         <a ref={anchorRef} className="btn btn-primary" onClick={ () => saveImage()}>Save</a>
+        <canvas ref={canvasFinal} style={{ background: "blue"}}/>
+        <p>Download image could take times if the image is large</p>
+        <a ref={anchorRef} className="btn btn-primary" onClick={ () => saveImage()}>Save</a>
         <Footer />
     </div>
   );
