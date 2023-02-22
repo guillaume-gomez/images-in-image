@@ -76,12 +76,12 @@ function App() {
         <canvas ref={canvasRef} />
         <p>{ratio}</p>
         <input min={1} max={32} type="range" className="range range-primary" value={ratio} onChange={(e) =>  resizeFinalImage(parseInt(e.target.value)) }/>
-        <a
-          className="App-link"
+        <button
+          className="btn btn-secondary"
           onClick={onClick}
         >
           Click pour generer l'image wesh !
-        </a>
+        </button>
         <canvas ref={canvasFinal} style={{ background: "red"}}/>
          <a ref={anchorRef} className="btn btn-primary" onClick={ () => saveImage()}>Save</a>
         <Footer />
