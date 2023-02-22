@@ -167,31 +167,20 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
   }
 
   function optimizedScale(imageWidth: number, imageHeight: number, pixelSize: number) : [number, number] {
-    // resize l'image pour etre sur que la taille de l'image fit les images
-    // soit x = width de l'image
-    // soit y = height de l'image
-    // soit c = la taille du sprite (spriteSize)
-
-    // il faut trouver le pgcd de x et y qui donne d
-    // faire (x/d)*c = xx ET (y/d)*c = yy
-    // faire ceil(xx) = xxx ou ceil(yy) = yyy ==> meme resultat
-
-    //image de taille finale est
-    // x2 = xxx * xx
-    // y2 = yyy * yy
     const pgcdBetweenWidthAndHeight = pgcd(imageWidth, imageHeight);
-    console.log(pgcdBetweenWidthAndHeight)
-    const ratioX = (imageWidth * pixelSize)/pgcdBetweenWidthAndHeight;
-    const ratioY = (imageHeight* pixelSize)/pgcdBetweenWidthAndHeight;
-    console.log("ratioX ->", ratioX)
-    console.log("ratioY ->", ratioY)
+    const minWidth = imageWidth/pgcdBetweenWidthAndHeight;
+    const minHeight = imageHeight/pgcdBetweenWidthAndHeight;
 
-    const newRatioImage = Math.ceil(ratioX);
+    const minWidthPixelSize = minWidth * pixelSize;
+    const minHeightPixelSize = minHeight * pixelSize;
+    
+    // this ratio is the same on the width and height
+    const newRatioImage = Math.ceil(imageWidth/minWidthPixelSize);
 
     console.log("newRatioImage => ", newRatioImage)
 
-    const expectedWidth =  newRatioImage * ratioX;
-    const expectedHeight = newRatioImage * ratioY;
+    const expectedWidth =  minWidth * newRatioImage;
+    const expectedHeight = minHeight * newRatioImage;
 
     return [expectedWidth, expectedHeight];
   }
