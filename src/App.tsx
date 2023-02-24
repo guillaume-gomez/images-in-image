@@ -31,13 +31,13 @@ function App() {
     {value: 28305, sprite: white},
   ]
 
-  const { generateImage, resizeImage, optimizedResize } = useFromImageToImages({picturesData, pixelSize: 32});
+  const { generateImage, optimizedGenerateImage, resizeImage, optimizedResize } = useFromImageToImages({picturesData, pixelSize: 32});
 
   function onClick() {
     if(imageRef.current && canvasFinal.current && canvasRef.current) {
-      generateImage(imageRef.current, canvasFinal.current);
-      optimizedResize(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height);
-      resizeImage(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height);
+      //generateImage(imageRef.current, canvasFinal.current);
+      optimizedGenerateImage(imageRef.current, canvasFinal.current, canvasRef.current)
+      //resizeImage(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height);
     }
   }
 
@@ -49,8 +49,6 @@ function App() {
       canvasFinal.current.height = height;
 
       generateImage(imageRef.current, canvasFinal.current);
-      resizeImage(canvasFinal.current, canvasFinal.current, width, height);
-
       setRatio(newRatio);
 
     }

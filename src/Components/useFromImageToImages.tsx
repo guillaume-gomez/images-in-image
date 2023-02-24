@@ -60,7 +60,7 @@ interface ImageDataInterface {
 export default function useFromImageToImages({ picturesData, pixelSize = pixelSizeDefault } : fromImageToImagesInterface) {
   const [imagesData, setImagesData] = useState<ImageDataInterface[]>([]);
 
-  function init(image: HTMLImageElement, canvasTarget: HTMLCanvasElement, pixelSize: number) : [CanvasRenderingContext2D, CanvasRenderingContext2D] {
+  function init(image: HTMLImageElement, canvasTarget: HTMLCanvasElement, expectedWidth: number, expectedHeight: number) : [CanvasRenderingContext2D, CanvasRenderingContext2D, HTMLCanvasElement] {
     const canvasBuffer = document.createElement("canvas");
     canvasBuffer.width = image.width;
     canvasBuffer.height = image.height;
@@ -76,31 +76,55 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
     if(!canvasTargetContext) {
       throw new Error("cannot find the context");
     }
-    const expectedWidth = image.width * pixelSize;
-    const expectedHeight = image.height * pixelSize;
     canvasTarget.width = expectedWidth;
     canvasTarget.height = expectedHeight;
 
-    return [canvasTargetContext, context];
+    return [canvasTargetContext, context, canvasBuffer];
   }
 
 
   function generateImage(image: HTMLImageElement, canvasTarget: HTMLCanvasElement) {
-      const [canvasTargetContext, context] = init(image, canvasTarget, pixelSize);
-
-      //convertToGrayScale(context, expectedWidth, expectedHeight);
+      const [canvasTargetContext, context] = init(image, canvasTarget, image.width * pixelSize, image.height * pixelSize);
       let imagesData = [];
       for(let y = 0; y < image.height; ++y) {
         for(let x = 0; x < image.width; ++x) {
-          const image = fromPixelColorToImage(getPixel(context, x,y));
-          canvasTargetContext.drawImage(image, x * pixelSize, y * pixelSize, image.width, image.height);
+          const pixelImage = fromPixelColorToImage(getPixel(context, x,y));
+          canvasTargetContext.drawImage(pixelImage, x * pixelSize, y * pixelSize, pixelImage.width, pixelImage.height);
           imagesData.push({image, x, y });
         }
       }
       setImagesData(imagesData);
-
-      //resizeImage(canvasTarget, canvasBuffer, image.width, image.height)
   }
+
+  function optimizedGenerateImage(image: HTMLImageElement, canvasTarget: HTMLCanvasElement,  canvasRef: HTMLCanvasElement) {
+      const [expectedWidth, expectedHeight] = optimizedScale(image.width, image.height, pixelSize);
+      const [canvasTargetContext, contextBuffer, canvasBuffer] = init(image, canvasTarget, expectedWidth, expectedHeight);
+
+      resizeImage(canvasBuffer, canvasBuffer, expectedWidth, expectedHeight);
+      console.log(canvasBuffer.width);
+      console.log(canvasBuffer.height);
+
+      //debug TO BE DELETED
+      const tempBuffer = canvasRef.getContext("2d");
+      canvasRef.width = expectedWidth;
+      canvasRef.height = expectedHeight;
+      if(tempBuffer) {
+        tempBuffer.drawImage(canvasBuffer, 0, 0, canvasBuffer.width, canvasBuffer.height);
+
+      }
+      // end debug
+
+
+      let imagesData = [];
+      for(let y = 0; y < canvasBuffer.height; y += pixelSize) {
+        for(let x = 0; x < canvasBuffer.width; x += pixelSize) {
+          const pixelImage = fromPixelColorToImage(interpolateArea(contextBuffer, pixelSize, x,y));
+          canvasTargetContext.drawImage(pixelImage, x, y, pixelImage.width, pixelImage.height);
+          imagesData.push({image, x, y });
+        }
+      }
+      setImagesData(imagesData);
+    }
 
   function render(canvasTargetContext: CanvasRenderingContext2D) {
     imagesData.map(({image, x, y}) => {
@@ -177,26 +201,25 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
     // this ratio is the same on the width and height
     const newRatioImage = Math.ceil(imageWidth/minWidthPixelSize);
 
-    console.log("newRatioImage => ", newRatioImage)
-
-    const expectedWidth =  minWidth * newRatioImage;
-    const expectedHeight = minHeight * newRatioImage;
+    const expectedWidth =  minWidthPixelSize * newRatioImage;
+    const expectedHeight = minHeightPixelSize * newRatioImage;
 
     return [expectedWidth, expectedHeight];
   }
 
   function optimizedResize(originCanvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement, width: number, height: number) {
     const [expectedWidth, expectedHeight] = optimizedScale(width, height, pixelSize);
-    console.log("optimizedResize ", expectedWidth, expectedHeight);
-    //resizeImage(originCanvas, targetCanvas, expectedWidth, expectedHeight);
+    resizeImage(originCanvas, targetCanvas, expectedWidth, expectedHeight);
   }
 
   function interpolateArea(context: CanvasRenderingContext2D, pixelSize: number, x: number, y: number) : number {
     const pixels = context.getImageData(x,y, pixelSize, pixelSize);
     const { data } = pixels;
+    const numberOfPixels = pixelSize * pixelSize;
     let red = 0;
     let green = 0;
     let blue = 0;
+
 
     for (let i = 0; i < data.length; i += 4) {
       red += data[i];
@@ -204,7 +227,7 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
       blue += data[i + 2];
     }
 
-    return ((red/data.length) * 100) + ((green/data.length) * 10) + (blue/data.length);
+    return ((red/numberOfPixels) * 100) + ((green/numberOfPixels) * 10) + (blue/numberOfPixels);
   }
 
   /*
@@ -227,5 +250,5 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
     context.putImageData(imageData, 0, 0);
   }
 
-  return { generateImage, resizeImage, optimizedResize, render };
+  return { generateImage, optimizedGenerateImage, resizeImage, optimizedResize, render };
 }
