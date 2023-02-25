@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { format as formatFns } from "date-fns";
-import useImage from "./Components/UseImage";
+import useImage from "./Hooks/UseImage";
 import useFromImageToImages from "./Hooks/useFromImageToImages";
+import StepFormCard from "./Components/StepFormCard";
 import image from "./image.png";
 
 import Header from "./Components/Header";
@@ -64,24 +65,36 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col gap-8 items-center">
-       <Header />
-       <h1 className="text-3xl font-bold underline text-primary">
-        Hello Michel!
-       </h1>
-        <img src={image} ref={imageRef} />
-        <canvas ref={canvasRef} />
-        <p>{ratio}</p>
-        <input min={1} max={32} type="range" className="range range-primary" value={ratio} onChange={(e) =>  resizeFinalImage(parseInt(e.target.value)) }/>
-        <button
-          className="btn btn-secondary"
-          onClick={onClick}
-        >
-          Click pour generer l'image wesh !
-        </button>
-        <canvas ref={canvasFinal} style={{ background: "blue"}}/>
-        <p>Download image could take times if the image is large</p>
-        <a ref={anchorRef} className="btn btn-primary" onClick={ () => saveImage()}>Save</a>
+    <div className="flex flex-col gap-8 from-success to-secondary text-primary-content -mt-[4rem] grid place-items-center items-end bg-gradient-to-br pt-20">
+       <Header/>
+          <div className="container">
+            <div className="w-full p-4 text-base-content glass xl:rounded-box flex flex-col gap-4 bg-opacity-60 xl:pb-0">
+              <StepFormCard
+                stepNumber={1}
+                title="Choose an image"
+                nextButtonText="Next 👉"
+              >
+                <h1>J'aodre </h1>
+              </StepFormCard>
+
+             <h1 className="text-3xl font-bold underline text-primary">
+              Hello Michel!
+             </h1>
+              <img src={image} ref={imageRef} />
+              <canvas ref={canvasRef} />
+              <p>{ratio}</p>
+              <input min={1} max={32} type="range" className="range range-primary" value={ratio} onChange={(e) =>  resizeFinalImage(parseInt(e.target.value)) }/>
+              <button
+                className="btn btn-secondary"
+                onClick={onClick}
+              >
+                Click pour generer l'image wesh !
+              </button>
+              <canvas ref={canvasFinal} style={{ background: "blue"}}/>
+              <p>Download image could take times if the image is large</p>
+              <a ref={anchorRef} className="btn btn-primary" onClick={ () => saveImage()}>Save</a>
+            </div>
+          </div>
         <Footer />
     </div>
   );
