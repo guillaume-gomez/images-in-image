@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 import { minBy } from "lodash";
 
 const pixelSizeDefault = 32;
-////////////////////
-//red = 255 * 100
-//green = 255 * 10
-//blue = 255;
-////////////////////
 /*const picturesData = [
-  {value: 0, sprite: "black"},
-  {value: 255, sprite: "blue"},
-  {value: 2550, sprite: "green"},
-  {value: 25500, sprite: "red"},
-  {value: 28305, sprite: "white"},
+  { pixel: { red: 0, green: 0, blue: 0 } sprite: "black"},
+  { pixel: { red: 0, green: 0, blue: 255 }, sprite: "blue"},
+  { pixel: { red: 0, green: 255, blue: 0 }, sprite: "green"},
+  { pixel: { red: 255, green: 0, blue: 0 }, sprite: "red"},
+  { pixel: { red: 255, green: 255, blue: 255 }, sprite: "white"},
 ];
 */
 
@@ -37,8 +32,14 @@ function pgcd(a: number, b: number) : number {
     }
 }
 
+interface Color {
+  red: number;
+  green: number;
+  blue: number;
+}
+
 interface pictureData {
-  value: number;
+  pixel: Color;
   sprite: HTMLImageElement | undefined;
 }
 
@@ -171,15 +172,40 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
   }
 
 
-  function getPixel(context: CanvasRenderingContext2D, x: number, y: number) : number {
+  function getPixel(context: CanvasRenderingContext2D, x: number, y: number) : Color {
     const pixel = context.getImageData(x, y, 1, 1);
     const { data } = pixel;
-    // note : what about adding transparency in that computation
-    return (data[0] * 100) + (data[1] * 10) + data[0];
+    return { red: data[0], green: data[1], blue: data[2] };
   }
 
-  function fromPixelColorToImage(pixelValue: number) : HTMLImageElement {
-    const comparaisonValues = picturesData.map(pixelType => ({ ...pixelType, value: Math.abs(pixelValue - pixelType.value)}) );
+  function interpolateArea(context: CanvasRenderingContext2D, pixelSize: number, x: number, y: number) : Color {
+    const pixels = context.getImageData(x,y, pixelSize, pixelSize);
+    const { data } = pixels;
+    const numberOfPixels = pixelSize * pixelSize;
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+
+
+    for (let i = 0; i < data.length; i += 4) {
+      red += data[i];
+      green += data[i + 1];
+      blue += data[i + 2];
+    }
+
+    return { red: (red/numberOfPixels), green: (green/numberOfPixels), blue: (blue/numberOfPixels) };
+  }
+
+  function colorDistance(pixel1: Color, pixel2: Color) : number {
+    const redDiff = (pixel2.red - pixel1.red);
+    const greenDiff = (pixel2.green - pixel1.green);
+    const blueDiff = (pixel2.blue - pixel1.blue);
+    return (redDiff * redDiff) + (greenDiff * greenDiff) + (blueDiff * blueDiff);
+  }
+
+
+  function fromPixelColorToImage(pixelValue: Color) : HTMLImageElement {
+    const comparaisonValues = picturesData.map(pixelType => ({ ...pixelType, value: colorDistance(pixelValue, pixelType.pixel)}) );
     const foundPixel = minBy(comparaisonValues, 'value');
     if(!foundPixel) {
       throw `No sprite found for the pixel with the value ${pixelValue}`;
@@ -210,24 +236,6 @@ export default function useFromImageToImages({ picturesData, pixelSize = pixelSi
   function optimizedResize(originCanvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement, width: number, height: number) {
     const [expectedWidth, expectedHeight] = optimizedScale(width, height, pixelSize);
     resizeImage(originCanvas, targetCanvas, expectedWidth, expectedHeight);
-  }
-
-  function interpolateArea(context: CanvasRenderingContext2D, pixelSize: number, x: number, y: number) : number {
-    const pixels = context.getImageData(x,y, pixelSize, pixelSize);
-    const { data } = pixels;
-    const numberOfPixels = pixelSize * pixelSize;
-    let red = 0;
-    let green = 0;
-    let blue = 0;
-
-
-    for (let i = 0; i < data.length; i += 4) {
-      red += data[i];
-      green += data[i + 1];
-      blue += data[i + 2];
-    }
-
-    return ((red/numberOfPixels) * 100) + ((green/numberOfPixels) * 10) + (blue/numberOfPixels);
   }
 
   /*

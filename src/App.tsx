@@ -24,12 +24,12 @@ function App() {
   const blue = useImage(process.env.PUBLIC_URL + "sprites/test/blue.png");
 
   const picturesData = [
-    {value: 0, sprite: black},
-    {value: 255, sprite: blue},
-    {value: 2550, sprite: green},
-    {value: 25500, sprite: red},
-    {value: 28305, sprite: white},
-  ]
+    { pixel: { red: 0, green: 0, blue: 0 }, sprite: black},
+    { pixel: { red: 0, green: 0, blue: 255 }, sprite: blue},
+    { pixel: { red: 0, green: 255, blue: 0 }, sprite: green},
+    { pixel: { red: 255, green: 0, blue: 0 }, sprite: red},
+    { pixel: { red: 255, green: 255, blue: 255 }, sprite: white}
+  ];
 
   const { generateImage, optimizedGenerateImage, resizeImage, optimizedResize } = useFromImageToImages({picturesData, pixelSize: 32});
 
