@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useState, RefObject } from 'react';
-import { minBy } from "lodash";
+import React, { useRef, useState } from 'react';
 import { format as formatFns } from "date-fns";
 import useImage from "./Components/UseImage";
-import useFromImageToImages from "./Components/useFromImageToImages";
+import useFromImageToImages from "./Hooks/useFromImageToImages";
 import image from "./image.png";
 
 import Header from "./Components/Header";
@@ -24,19 +23,19 @@ function App() {
   const blue = useImage(process.env.PUBLIC_URL + "sprites/test/blue.png");
 
   const picturesData = [
-    { pixel: { red: 0, green: 0, blue: 0 }, sprite: black},
-    { pixel: { red: 0, green: 0, blue: 255 }, sprite: blue},
-    { pixel: { red: 0, green: 255, blue: 0 }, sprite: green},
-    { pixel: { red: 255, green: 0, blue: 0 }, sprite: red},
-    { pixel: { red: 255, green: 255, blue: 255 }, sprite: white}
+    { color: { red: 0, green: 0, blue: 0 }, sprite: black},
+    { color: { red: 0, green: 0, blue: 255 }, sprite: blue},
+    { color: { red: 0, green: 255, blue: 0 }, sprite: green},
+    { color: { red: 255, green: 0, blue: 0 }, sprite: red},
+    { color: { red: 255, green: 255, blue: 255 }, sprite: white}
   ];
 
-  const { generateImage, optimizedGenerateImage, resizeImage, optimizedResize } = useFromImageToImages({picturesData, pixelSize: 32});
+  const { generateImage, optimizedGenerateImage, resizeImage, optimizedResize } = useFromImageToImages({picturesData, dominantImageSize: 32});
 
   function onClick() {
     if(imageRef.current && canvasFinal.current && canvasRef.current) {
       //generateImage(imageRef.current, canvasFinal.current);
-      optimizedGenerateImage(imageRef.current, canvasFinal.current, canvasRef.current)
+      optimizedGenerateImage(imageRef.current, canvasFinal.current)
       //resizeImage(canvasFinal.current, canvasRef.current, imageRef.current.width, imageRef.current.height);
     }
   }
