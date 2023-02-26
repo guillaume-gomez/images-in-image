@@ -1,9 +1,8 @@
 import React, { useState, useLayoutEffect } from 'react';
 
-//process.env.PUBLIC_URL + "logo512.png"
 
-function UseImage(url: string) {
-  const [image, setImage] = useState<HTMLImageElement>();
+function useImage(base64Image: string) : [HTMLImageElement, (image: HTMLImageElement) => void] {
+  const [image, setImage] = useState<HTMLImageElement>(new Image());
 
   useLayoutEffect(
      () => {
@@ -11,13 +10,13 @@ function UseImage(url: string) {
 
       function onload() {
         setImage(img);
-        console.log("loaded " + url)
+        console.log("loaded " + base64Image)
       }
 
       function onerror() {
-        console.log("error " + url)
+        console.log("error " + base64Image)
       }
-      img.src = url;
+      img.src = base64Image;
 
       img.addEventListener('load', onload);
       img.addEventListener('error', onerror);
@@ -30,7 +29,7 @@ function UseImage(url: string) {
     },
     []
   );
-  return image;
+  return [image, setImage];
 }
 
-export default UseImage;
+export default useImage;

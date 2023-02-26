@@ -54,6 +54,8 @@ export default function useFromImageToImages({ picturesData, dominantImageSize =
       const contextBuffer = getContext(canvasBuffer);
       const contextTarget = getContext(canvasTarget);
 
+      console.log("(", canvasTarget.width, ", ", canvasTarget.height, ")");
+
       for(let y = 0; y < image.height; ++y) {
         for(let x = 0; x < image.width; ++x) {
           const pixelImage = fromColorToDominantImage(fromPixelToColor(contextBuffer, x,y));
@@ -64,6 +66,11 @@ export default function useFromImageToImages({ picturesData, dominantImageSize =
 
   function optimizedGenerateImage(image: HTMLImageElement, canvasTarget: HTMLCanvasElement) {
       const [expectedWidth, expectedHeight] = optimizedScale(image.width, image.height, dominantImageSize);
+      canvasTarget.width = expectedWidth;
+      canvasTarget.height = expectedHeight;
+
+      console.log("(", expectedWidth, ", ", expectedHeight, ")");
+
       const canvasBuffer = createCanvasBuffer(image);
 
       const contextBuffer = getContext(canvasBuffer);
@@ -116,21 +123,35 @@ export default function useFromImageToImages({ picturesData, dominantImageSize =
     return foundPixel.sprite;
   }
 
-  function optimizedScale(imageWidth: number, imageHeight: number, dominantImageSize: number) : [number, number] {
+  function optimizedScaleBasic(imageWidth: number, imageHeight: number, dominantImageSize: number) : [number, number] {
     const pgcdBetweenWidthAndHeight = pgcd(imageWidth, imageHeight);
     const minWidth = imageWidth/pgcdBetweenWidthAndHeight;
     const minHeight = imageHeight/pgcdBetweenWidthAndHeight;
 
     const minWidthPixelSize = minWidth * dominantImageSize;
     const minHeightPixelSize = minHeight * dominantImageSize;
-    
+
     // this ratio is the same on the width and height
     const newRatioImage = Math.ceil(imageWidth/minWidthPixelSize);
+
+    console.log("newRatioImage ", newRatioImage);
 
     const expectedWidth =  minWidthPixelSize * newRatioImage;
     const expectedHeight = minHeightPixelSize * newRatioImage;
 
     return [expectedWidth, expectedHeight];
+
+  }
+
+  function optimizedScale(imageWidth: number, imageHeight: number, dominantImageSize: number) : [number, number] {
+    const pgcdBetweenWidthAndHeight = pgcd(imageWidth, imageHeight);
+    if(pgcdBetweenWidthAndHeight === 1) {
+      const truncatedWidth = imageWidth + (imageWidth % 10);
+      const truncatedHeight = imageHeight + (imageHeight % 10);
+        return optimizedScaleBasic(truncatedWidth, truncatedHeight, dominantImageSize);
+    } else {
+      return optimizedScaleBasic(imageWidth, imageHeight, dominantImageSize);
+    }
   }
 
   function optimizedResize(originCanvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement, width: number, height: number) {

@@ -50,11 +50,7 @@ export function resizeImage(originCanvas: HTMLCanvasElement, targetCanvas: HTMLC
 
   contextBuffer.drawImage(canvasBuffer, 0, 0, canvasBuffer.width * 0.5, canvasBuffer.height * 0.5);
 
-  const context = targetCanvas.getContext("2d");
-  if(!context) {
-    throw new Error("Error: context not found");
-    return;
-  }
+  const context = getContext(targetCanvas);
 
   targetCanvas.width = expectedWidth;
   targetCanvas.height = expectedHeight;

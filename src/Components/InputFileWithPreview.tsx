@@ -32,7 +32,7 @@ function InputFileWithPreview({onChange, value} : InputFileWithPreviewProps) {
       </label>
       {
         value ?
-        <img src={value.src} width='200px'/> :
+        <img src={value.src} style={{ minWidth: "64px", maxWidth: "100px"}}/> :
         <span>Nothing to render</span>
 
       }
