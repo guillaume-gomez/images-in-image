@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { minBy } from "lodash";
-import { pgcd, getContext, colorDistance, resizeImage } from "../tools";
+import { pgcd, getContext, colorDistance, resizeImageCanvas } from "../tools";
 import { Color } from "../types";
 
-
-const dominantImageSizeDefault = 32;
+export const dominantImageSizeDefault = 32;
 /*const picturesData = [
   { pixel: { red: 0, green: 0, blue: 0 } sprite: "black"},
   { pixel: { red: 0, green: 0, blue: 255 }, sprite: "blue"},
@@ -75,7 +74,7 @@ export default function useFromImageToImages({ picturesData, dominantImageSize =
 
       const contextBuffer = getContext(canvasBuffer);
       const contextTarget = getContext(canvasTarget);
-      resizeImage(canvasBuffer, canvasBuffer, expectedWidth, expectedHeight);
+      resizeImageCanvas(canvasBuffer, canvasBuffer, expectedWidth, expectedHeight);
 
       for(let y = 0; y < canvasBuffer.height; y += dominantImageSize) {
         for(let x = 0; x < canvasBuffer.width; x += dominantImageSize) {
@@ -156,8 +155,8 @@ export default function useFromImageToImages({ picturesData, dominantImageSize =
 
   function optimizedResize(originCanvas: HTMLCanvasElement, targetCanvas: HTMLCanvasElement, width: number, height: number) {
     const [expectedWidth, expectedHeight] = optimizedScale(width, height, dominantImageSize);
-    resizeImage(originCanvas, targetCanvas, expectedWidth, expectedHeight);
+    resizeImageCanvas(originCanvas, targetCanvas, expectedWidth, expectedHeight);
   }
 
-  return { generateImage, optimizedGenerateImage, resizeImage, optimizedResize };
+  return { generateImage, optimizedGenerateImage, resizeImageCanvas, optimizedResize };
 }

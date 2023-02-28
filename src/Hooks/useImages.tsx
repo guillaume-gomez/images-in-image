@@ -28,23 +28,25 @@ function useImages() : useImagesHookInterface {
   const [blue, setBlue] = useImage(blueImage);
 
   function setImage(key : ColorType, image: HTMLImageElement) {
+    // get the 32 from useFromImageToImages
     // TODO RESIZE IMAGE BEFORE SAVING
+    const resizedImage = resizeImage(image, 32, 32)
     switch(key) {
       default:
       case "white":
-          setWhite(image);
+          setWhite(resizedImage);
           return;
       case "black":
-          setBlack(image);
+          setBlack(resizedImage);
           return;
       case "red":
-          setRed(image);
+          setRed(resizedImage);
           return;
       case "green":
-          setGreen(image);
+          setGreen(resizedImage);
           return;
       case "blue":
-          setBlue(image);
+          setBlue(resizedImage);
           return;
     }
   }
