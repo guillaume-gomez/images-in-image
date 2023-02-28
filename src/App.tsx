@@ -5,7 +5,7 @@ import useFromImageToImages from "./Hooks/useFromImageToImages";
 import StepFormCard from "./Components/StepFormCard";
 import InputFileWithPreview from "./Components/InputFileWithPreview";
 import sampleImage from "./image.png";
-import { resizeImage } from "./tools";
+import { resizeImageCanvas } from "./tools";
 
 
 import Header from "./Components/Header";
@@ -19,6 +19,7 @@ function App() {
   const [algorithmType, setAlgorithmType] = useState<AlgorithmType>("optimized");
   const [image, setImage] = useState<HTMLImageElement>();
   const [error, setError] = useState<string>("");
+  const [ratio, setRatio] = useState<number>(1);
   const [fullscreen, setFullscreen] = useState<boolean>(false);
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const canvasPreview = useRef<HTMLCanvasElement>(null);
@@ -56,7 +57,7 @@ function App() {
         generateImage(image, canvasFinal.current);
       }
       // generate preview
-      resizeImage(canvasFinal.current, canvasPreview.current, canvasFinal.current.width, canvasFinal.current.height);
+      resizeImageCanvas(canvasFinal.current, canvasPreview.current, canvasFinal.current.width, canvasFinal.current.height);
       moveTo("result");
     }
   }
@@ -127,6 +128,17 @@ function App() {
                     <option key="1" value="optimized">Optimised</option>
                     <option key="2" value="biggestImage"> Biggest Image</option>
                 </select>
+                <div>
+                  <label>Ratio</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={ratio}
+                    onChange={(e) => setRatio(parseInt(e.target.value))}
+                    className="range range-primary"
+                  />
+                </div>
               </StepFormCard>
 
               <StepFormCard
