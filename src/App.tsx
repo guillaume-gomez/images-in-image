@@ -4,6 +4,7 @@ import useImages from "./Hooks/useImages";
 import useFromImageToImages from "./Hooks/useFromImageToImages";
 import StepFormCard from "./Components/StepFormCard";
 import InputFileWithPreview from "./Components/InputFileWithPreview";
+import Toggle from "./Components/Toggle";
 import sampleImage from "./image.png";
 import { resizeImageCanvas } from "./tools";
 
@@ -20,7 +21,10 @@ function App() {
   const [image, setImage] = useState<HTMLImageElement>();
   const [error, setError] = useState<string>("");
   const [ratio, setRatio] = useState<number>(1);
+  const [allowResize, setAllowResize] = useState<boolean>(false);
   const [fullscreen, setFullscreen] = useState<boolean>(false);
+  const [possibleWidth, setPossibleWidth] = useState<number>(0);
+  const [possibleHeight, setPossibleHeight] = useState<number>(0);
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const canvasPreview = useRef<HTMLCanvasElement>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
@@ -43,6 +47,9 @@ function App() {
     }
   }
 
+  function renderPreview() {
+    return <canvas className="bg-accent" width={possibleWidth} height={possibleHeight} />
+  }
 
   function generateImagesInImage() {
     if(!image) {
@@ -72,6 +79,13 @@ function App() {
     }
   }
 
+  function uploadImage(newImage: HTMLImageElement) {
+    setImage(newImage);
+    setError("");
+    setPossibleWidth(newImage.width);
+    setPossibleHeight(newImage.height);
+  }
+
   return (
     <div className="flex flex-col gap-8 from-success to-secondary text-primary-content -mt-[4rem] grid place-items-center items-end bg-gradient-to-br pt-20">
        <Header/>
@@ -94,7 +108,7 @@ function App() {
                     </div>
                   : <></>
                 }
-                <InputFileWithPreview onChange={(image) => { setImage(image); setError(""); } } value={image} />
+                <InputFileWithPreview onChange={uploadImage} value={image} />
               </StepFormCard>
               <StepFormCard
                 id="custom-palette"
@@ -129,15 +143,32 @@ function App() {
                     <option key="2" value="biggestImage"> Biggest Image</option>
                 </select>
                 <div>
-                  <label>Ratio</label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={ratio}
-                    onChange={(e) => setRatio(parseInt(e.target.value))}
-                    className="range range-primary"
-                  />
+                  {
+                    algorithmType === "optimized" ?
+                      (
+                        <div>
+                          <Toggle
+                            label="Allow resize (will impact the proportions)"
+                            value={allowResize}
+                            toggle={() => setAllowResize(!allowResize)}
+                          />
+                          <div>
+                            <label>Ratio</label>
+                            <input
+                              type="range"
+                              min="1"
+                              max="10"
+                              value={ratio}
+                              onChange={(e) => setRatio(parseInt(e.target.value))}
+                              className="range range-primary"
+                              />
+                            <span>{ratio}</span>
+                          </div>
+                          { renderPreview() }
+                        </div>
+                      ) :
+                      <></>
+                  }
                 </div>
               </StepFormCard>
 
@@ -147,14 +178,13 @@ function App() {
                 title="See the Result"
               >
                 <div>
-                  {/* change class instead of conditional rendering to make sure the components are always mounted*/}
-                  <div className="form-control">
-                    <label className="label cursor-pointer">
-                      <span className="label-text">Show real result</span>
-                      <input type="checkbox" className="toggle toggle-primary" checked={fullscreen} onChange={() => setFullscreen(!fullscreen) } />
-                    </label>
-                  </div>
+                  <Toggle
+                    label="Show real result"
+                    value={fullscreen}
+                    toggle={() => setFullscreen(!fullscreen)}
+                  />
                   <span>The image could be wider than your screen. That is why we display the preview at first</span>
+                  {/* change class instead of conditional rendering to make sure the components are always mounted*/}
                   <canvas className={ fullscreen ? "hidden" : "w-full"} ref={canvasPreview} />
                   <div className="w-full relative overflow-x-scroll" style={{ minHeight: "400px" }} >
                     <canvas className={ fullscreen ? "absolute" : " absolute hidden"} ref={canvasFinal} style={{ overflow: 'scroll'}}/>
