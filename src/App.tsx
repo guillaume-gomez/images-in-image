@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { format as formatFns } from "date-fns";
 import useImages from "./Hooks/useImages";
 import useFromImageToImages from "./Hooks/useFromImageToImages";
+import useImageSizes from "./Hooks/useImageSizes";
 import StepFormCard from "./Components/StepFormCard";
 import InputFileWithPreview from "./Components/InputFileWithPreview";
 import Toggle from "./Components/Toggle";
@@ -20,15 +21,13 @@ function App() {
   const [algorithmType, setAlgorithmType] = useState<AlgorithmType>("optimized");
   const [image, setImage] = useState<HTMLImageElement>();
   const [error, setError] = useState<string>("");
-  const [ratio, setRatio] = useState<number>(1);
-  const [allowResize, setAllowResize] = useState<boolean>(false);
   const [fullscreen, setFullscreen] = useState<boolean>(false);
-  const [possibleWidth, setPossibleWidth] = useState<number>(0);
-  const [possibleHeight, setPossibleHeight] = useState<number>(0);
+
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const canvasPreview = useRef<HTMLCanvasElement>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+
   const { paletteImages, setPaletteImage } = useImages();
 
   const picturesData = [
@@ -40,6 +39,25 @@ function App() {
   ];
   const { generateImage, optimizedGenerateImage } = useFromImageToImages({picturesData, dominantImageSize: 32});
 
+  const {
+    computePossibleSize,
+    setPossibleSize,
+    possibleWidth,
+    possibleHeight,
+    allowResize,
+    setAllowResize,
+    ratio,
+    setRatio,
+    bestProportion,
+    setBestProportion
+  } = useImageSizes(32);
+
+  useEffect(() => {
+    if(image) {
+      computePossibleSize(image.width, image.height);
+    }
+  }, [image, allowResize, bestProportion, ratio])
+
   function moveTo(id: string) {
     const element = document.getElementById(id);
     if (element) {
@@ -48,7 +66,15 @@ function App() {
   }
 
   function renderPreview() {
-    return <canvas className="bg-accent" width={possibleWidth} height={possibleHeight} />
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-3">
+          <span>Width : {possibleWidth}</span>
+          <span>Height : {possibleHeight}</span>
+        </div>
+        <canvas className="bg-accent" style={{width: possibleWidth, height: possibleHeight}} />
+      </div>)
   }
 
   function generateImagesInImage() {
@@ -58,8 +84,7 @@ function App() {
     }
     if(image && canvasFinal.current && canvasPreview.current) {
       if(algorithmType === "optimized") {
-        optimizedGenerateImage(image, canvasFinal.current);
-
+        optimizedGenerateImage(image, canvasFinal.current, possibleWidth, possibleHeight);
       } else {
         generateImage(image, canvasFinal.current);
       }
@@ -82,8 +107,7 @@ function App() {
   function uploadImage(newImage: HTMLImageElement) {
     setImage(newImage);
     setError("");
-    setPossibleWidth(newImage.width);
-    setPossibleHeight(newImage.height);
+    setPossibleSize(newImage.width, newImage.height);
   }
 
   return (
@@ -151,6 +175,11 @@ function App() {
                             label="Allow resize (will impact the proportions)"
                             value={allowResize}
                             toggle={() => setAllowResize(!allowResize)}
+                          />
+                          <Toggle
+                            label="Best proportion"
+                            value={bestProportion}
+                            toggle={() => setBestProportion(!bestProportion)}
                           />
                           <div>
                             <label>Ratio</label>
