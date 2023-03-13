@@ -4,14 +4,6 @@ import { pgcd, getContext, colorDistance, resizeImageCanvas } from "../tools";
 import { Color } from "../types";
 
 export const dominantImageSizeDefault = 32;
-/*const picturesData = [
-  { pixel: { red: 0, green: 0, blue: 0 } sprite: "black"},
-  { pixel: { red: 0, green: 0, blue: 255 }, sprite: "blue"},
-  { pixel: { red: 0, green: 255, blue: 0 }, sprite: "green"},
-  { pixel: { red: 255, green: 0, blue: 0 }, sprite: "red"},
-  { pixel: { red: 255, green: 255, blue: 255 }, sprite: "white"},
-];
-*/
 
 interface pictureData {
   color: Color;

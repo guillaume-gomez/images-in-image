@@ -107,3 +107,7 @@ function convertToGrayScale(context: CanvasRenderingContext2D, width: number, he
   }
   context.putImageData(imageData, 0, 0);
 }
+
+export function fromColorArrayToStringCSS(color: Color) : string {
+  return `rgb(${color.red}, ${color.green}, ${color.blue})`;
+}

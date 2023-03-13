@@ -7,8 +7,7 @@ import StepFormCard from "./Components/StepFormCard";
 import InputFileWithPreview from "./Components/InputFileWithPreview";
 import Toggle from "./Components/Toggle";
 import sampleImage from "./image.png";
-import { resizeImageCanvas } from "./tools";
-
+import { resizeImageCanvas, fromColorArrayToStringCSS } from "./tools";
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -33,9 +32,20 @@ function App() {
   const picturesData = [
     { color: { red: 0, green: 0, blue: 0 }, sprite: paletteImages[0].sprite},
     { color: { red: 255, green: 255, blue: 255 }, sprite: paletteImages[1].sprite},
-    { color: { red: 255, green: 0, blue: 0 }, sprite: paletteImages[2].sprite},
-    { color: { red: 0, green: 255, blue: 0 }, sprite: paletteImages[3].sprite},
-    { color: { red: 0, green: 0, blue: 255 }, sprite: paletteImages[4].sprite}
+
+    { color: { red: 255, green: 0, blue: 0}, sprite: paletteImages[2].sprite },
+    { color: { red: 255, green: 128, blue: 0}, sprite: paletteImages[3].sprite },
+    { color: { red: 255, green: 255, blue: 0}, sprite: paletteImages[4].sprite },
+
+    { color: { red: 128, green: 255, blue: 0}, sprite: paletteImages[5].sprite },
+    { color: { red: 0, green: 255, blue: 0}, sprite: paletteImages[6].sprite },
+    { color: { red: 0, green: 255, blue: 80}, sprite: paletteImages[7].sprite },
+    { color: { red: 0, green: 255, blue: 255}, sprite: paletteImages[8].sprite },
+    { color: { red: 0, green: 128, blue: 255}, sprite: paletteImages[9].sprite },
+    { color: { red: 0, green: 0, blue: 255}, sprite: paletteImages[10].sprite },
+    { color: { red: 128, green: 0, blue: 255}, sprite: paletteImages[11].sprite },
+    { color: { red: 255, green: 0, blue: 255}, sprite: paletteImages[12].sprite },
+    { color: { red: 255, green: 0, blue: 128}, sprite: paletteImages[13].sprite }
   ];
   const { generateImage, optimizedGenerateImage } = useFromImageToImages({picturesData, dominantImageSize: 32});
 
@@ -143,8 +153,18 @@ function App() {
               >
                 { paletteImages.map(paletteImage => {
                     return (
-                    <div key={paletteImage.name}>
-                      <label>{paletteImage.name}</label>
+                    <div key={paletteImage.name} className="flex flex-col gap-2">
+                      <label className="flex flex-row gap-1">
+                        {paletteImage.name}
+                        <span
+                          className="p-3"
+                          style={{
+                            border: "1px solid black",
+                            background: fromColorArrayToStringCSS(paletteImage.color)
+                          }}
+                        >
+                        </span>
+                      </label>
                       <InputFileWithPreview onChange={(image) => {setPaletteImage(paletteImage.name, image) }} value={paletteImage.sprite} />
                     </div>)
                 })
