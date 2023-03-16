@@ -10,11 +10,11 @@ function useImage(base64Image: string) : [HTMLImageElement, (image: HTMLImageEle
 
       function onload() {
         setImage(img);
-        console.log("loaded " + base64Image)
+        //console.log("loaded " + base64Image)
       }
 
       function onerror() {
-        console.log("error " + base64Image)
+        //console.log("error " + base64Image)
       }
       img.src = base64Image;
 
