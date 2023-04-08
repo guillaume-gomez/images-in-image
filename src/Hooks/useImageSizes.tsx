@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { pgcd } from "../tools";
 
 function useImageSizes(dominantImageSize: number) {
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
+  const [resizeRatio, setResizeRatio] = useState<number>(10);
   const [allowResize, setAllowResize] = useState<boolean>(false);
   const [bestProportion, setBestProportion] = useState<boolean>(true);
   const [ratio, setRatio] = useState<number>(1);
@@ -39,8 +40,8 @@ function useImageSizes(dominantImageSize: number) {
   function optimizedScale(imageWidth: number, imageHeight: number, allowResize: boolean) : [number, number] {
     const pgcdBetweenWidthAndHeight = pgcd(imageWidth, imageHeight);
     if(allowResize) {
-      const truncatedWidth = imageWidth + (imageWidth % 10);
-      const truncatedHeight = imageHeight + (imageHeight % 10);
+      const truncatedWidth = imageWidth + (imageWidth % resizeRatio);
+      const truncatedHeight = imageHeight + (imageHeight % resizeRatio);
         return optimizedScaleBasic(truncatedWidth, truncatedHeight, dominantImageSize, bestProportion);
     } else {
       return optimizedScaleBasic(imageWidth, imageHeight, dominantImageSize, bestProportion);

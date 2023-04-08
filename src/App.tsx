@@ -21,6 +21,7 @@ function App() {
   const [image, setImage] = useState<HTMLImageElement>();
   const [error, setError] = useState<string>("");
   const [fullscreen, setFullscreen] = useState<boolean>(false);
+  const [pendingSave, setPendingSave] = useState<boolean>(false);
 
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const canvasPreview = useRef<HTMLCanvasElement>(null);
@@ -63,6 +64,7 @@ function App() {
   } = useImageSizes(32);
 
   useEffect(() => {
+    console.log("ratio changed ", ratio)
     if(image) {
       computePossibleSize(image.width, image.height);
     }
@@ -76,14 +78,15 @@ function App() {
   }
 
   function renderPreview() {
-
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 w-full">
         <div className="flex gap-3">
           <span>Width : {possibleWidth}</span>
           <span>Height : {possibleHeight}</span>
         </div>
-        <canvas className="bg-accent" style={{width: possibleWidth, height: possibleHeight}} />
+        <div className="overflow-auto">
+          <canvas className="bg-accent w-full" style={{maxWidth: possibleWidth, maxHeight: possibleHeight}} />
+        </div>
       </div>)
   }
 
@@ -104,8 +107,26 @@ function App() {
     }
   }
 
+
+  function isCanvasBlank() : boolean {
+    if(!canvasFinal.current) {
+      return true;
+    }
+
+    const context = canvasFinal.current.getContext('2d');
+    if (!context) {
+      return true;
+    }
+
+    const pixelBuffer = new Uint32Array(
+      context.getImageData(0, 0, canvasFinal.current.width, canvasFinal.current.height).data.buffer
+    );
+    return !pixelBuffer.some(color => color !== 0);
+  }
+
   function saveImage() {
     if(canvasFinal.current && anchorRef.current) {
+
       const format = "jpeg";
       const dataURL = canvasFinal.current.toDataURL(`image/${format}`);
       const dateString = formatFns(new Date(), "dd-MM-yyyy-hh-mm");
@@ -204,12 +225,13 @@ function App() {
                           <div>
                             <label>Ratio</label>
                             <input
+                              disabled={bestProportion}
                               type="range"
                               min="1"
-                              max="10"
+                              max={20}
                               value={ratio}
                               onChange={(e) => setRatio(parseInt(e.target.value))}
-                              className="range range-primary"
+                              className={`range ${bestProportion ? "range-error" : "range-primary"}`}
                               />
                             <span>{ratio}</span>
                           </div>
@@ -240,7 +262,11 @@ function App() {
                   </div>
                 </div>
                 <p>Download image could take times if the image is large</p>
-                <a ref={anchorRef} className="btn btn-primary" onClick={ () => saveImage()}>Save</a>
+                <a
+                  ref={anchorRef}
+                  className={`btn btn-primary ${isCanvasBlank() ? "btn-disabled" : "" }`}
+                  onClick={ () => saveImage()}
+                >Save 📸</a>
               </StepFormCard>
             </div>
           </div>
