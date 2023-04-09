@@ -145,7 +145,7 @@ function App() {
     <div className="flex flex-col gap-8 from-success to-secondary text-primary-content -mt-[4rem] grid place-items-center items-end bg-gradient-to-br pt-20">
        <Header/>
           <div className="container">
-            <div className="w-full p-4 text-base-content glass xl:rounded-box flex flex-col gap-4 bg-opacity-60 xl:pb-0">
+            <div className="w-full p-4 text-base-content glass xl:rounded-box flex flex-col gap-4 bg-opacity-60">
               <StepFormCard
                 id="choose-image"
                 stepNumber={1}
@@ -181,6 +181,7 @@ function App() {
                           className="p-3"
                           style={{
                             border: "1px solid black",
+                            borderRadius: "6px",
                             background: fromColorArrayToStringCSS(paletteImage.color)
                           }}
                         >
