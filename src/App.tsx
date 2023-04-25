@@ -60,7 +60,9 @@ function App() {
     ratio,
     setRatio,
     bestProportion,
-    setBestProportion
+    setBestProportion,
+    truncateBy,
+    setTruncateBy
   } = useImageSizes(32);
 
   useEffect(() => {
@@ -68,7 +70,7 @@ function App() {
     if(image) {
       computePossibleSize(image.width, image.height);
     }
-  }, [image, allowResize, bestProportion, ratio])
+  }, [image, allowResize, bestProportion, ratio, truncateBy])
 
   function moveTo(id: string) {
     const element = document.getElementById(id);
@@ -218,6 +220,19 @@ function App() {
                             value={allowResize}
                             toggle={() => setAllowResize(!allowResize)}
                           />
+                          <div>
+                            <label>Truncate by</label>
+                            <input
+                              disabled={!allowResize}
+                              type="range"
+                              min={2}
+                              max={10}
+                              value={truncateBy}
+                              onChange={(e) => setTruncateBy(parseInt(e.target.value))}
+                              className={`range ${allowResize ? "range-primary" : "range-error" }`}
+                              />
+                            <span>{truncateBy}</span>
+                          </div>
                           <Toggle
                             label="Best proportion"
                             value={bestProportion}

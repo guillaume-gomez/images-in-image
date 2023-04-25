@@ -7,6 +7,7 @@ function useImageSizes(dominantImageSize: number) {
   const [resizeRatio, setResizeRatio] = useState<number>(10);
   const [allowResize, setAllowResize] = useState<boolean>(false);
   const [bestProportion, setBestProportion] = useState<boolean>(true);
+  const [truncateBy, setTruncateBy] = useState<number>(2);
   const [ratio, setRatio] = useState<number>(1);
 
   function setPossibleSize(width: number, height: number) {
@@ -40,8 +41,8 @@ function useImageSizes(dominantImageSize: number) {
   function optimizedScale(imageWidth: number, imageHeight: number, allowResize: boolean) : [number, number] {
     const pgcdBetweenWidthAndHeight = pgcd(imageWidth, imageHeight);
     if(allowResize) {
-      const truncatedWidth = imageWidth + (imageWidth % resizeRatio);
-      const truncatedHeight = imageHeight + (imageHeight % resizeRatio);
+      const truncatedWidth = imageWidth + (imageWidth % truncateBy);
+      const truncatedHeight = imageHeight + (imageHeight % truncateBy);
         return optimizedScaleBasic(truncatedWidth, truncatedHeight, dominantImageSize, bestProportion);
     } else {
       return optimizedScaleBasic(imageWidth, imageHeight, dominantImageSize, bestProportion);
@@ -63,7 +64,9 @@ function useImageSizes(dominantImageSize: number) {
     ratio,
     setRatio,
     bestProportion,
-    setBestProportion
+    setBestProportion,
+    truncateBy,
+    setTruncateBy
   }
 }
 
