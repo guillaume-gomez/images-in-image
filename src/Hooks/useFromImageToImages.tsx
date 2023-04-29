@@ -22,8 +22,6 @@ export interface ImageDataInterface {
 }
 
 
-//TODO
-// interdire les images qui ont une composante plus petite que le dominantImageSize
 export default function useFromImageToImages({ picturesData, dominantImageSize = dominantImageSizeDefault } : FromImageToImagesInterface) {
   const [imagesData, setImagesData] = useState<ImageDataInterface[]>([]);
 

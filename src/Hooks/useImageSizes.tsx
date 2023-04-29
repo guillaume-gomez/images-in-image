@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { minBy } from "lodash";
 import { pgcd } from "../tools";
 
 function useImageSizes(dominantImageSize: number) {
@@ -7,7 +8,6 @@ function useImageSizes(dominantImageSize: number) {
   const [resizeRatio, setResizeRatio] = useState<number>(10);
   const [allowResize, setAllowResize] = useState<boolean>(false);
   const [bestProportion, setBestProportion] = useState<boolean>(true);
-  const [truncateBy, setTruncateBy] = useState<number>(2);
   const [ratio, setRatio] = useState<number>(1);
 
   function setPossibleSize(width: number, height: number) {
@@ -26,9 +26,6 @@ function useImageSizes(dominantImageSize: number) {
     if(bestProportion) {
       // this ratio is the same on the width and height
       const newRatioImage = Math.ceil(imageWidth/minWidthPixelSize);
-
-      console.log("newRatioImage ", newRatioImage);
-
       const expectedWidth =  minWidthPixelSize * newRatioImage;
       const expectedHeight = minHeightPixelSize * newRatioImage;
 
@@ -41,9 +38,7 @@ function useImageSizes(dominantImageSize: number) {
   function optimizedScale(imageWidth: number, imageHeight: number, allowResize: boolean) : [number, number] {
     const pgcdBetweenWidthAndHeight = pgcd(imageWidth, imageHeight);
     if(allowResize) {
-      const truncatedWidth = imageWidth + (imageWidth % truncateBy);
-      const truncatedHeight = imageHeight + (imageHeight % truncateBy);
-        return optimizedScaleBasic(truncatedWidth, truncatedHeight, dominantImageSize, bestProportion);
+        return findBestCombinaisonTruncatedBy(imageWidth, imageHeight);
     } else {
       return optimizedScaleBasic(imageWidth, imageHeight, dominantImageSize, bestProportion);
     }
@@ -52,6 +47,21 @@ function useImageSizes(dominantImageSize: number) {
   function computePossibleSize(imageWidth: number, imageHeight: number) {
     const [possibleWidth, possibleHeight] = optimizedScale(imageWidth, imageHeight, allowResize);
     setPossibleSize(possibleWidth, possibleHeight);
+  }
+
+  function findBestCombinaisonTruncatedBy(imageWidth: number, imageHeight: number) : [number, number] {
+    let combinaisons = [];
+    for(let truncate = 2; truncate <= 12; truncate++) {
+      const truncatedWidth = imageWidth + (imageWidth % truncate);
+      const truncatedHeight = imageHeight + (imageHeight % truncate);
+      const combinaison = optimizedScaleBasic(truncatedWidth, truncatedHeight, dominantImageSize, bestProportion);
+      combinaisons.push(combinaison);
+    }
+    const bestCombinaison = minBy(combinaisons, (combinaison: [number, number]) => combinaison[0] * combinaison[1]);
+    if(!bestCombinaison) {
+      return [imageWidth, imageHeight];
+    }
+    return bestCombinaison;
   }
 
   return {
@@ -65,8 +75,6 @@ function useImageSizes(dominantImageSize: number) {
     setRatio,
     bestProportion,
     setBestProportion,
-    truncateBy,
-    setTruncateBy
   }
 }
 

@@ -47,6 +47,8 @@ interface paletteImage {
 interface useImagesHookInterface {
   paletteImages: paletteImage[];
   setPaletteImage: (key : ColorType, image: HTMLImageElement) => void;
+  removeColor: (key : ColorType) => void;
+  restorePaletteImages: () => void;
 }
 
 function useImages() : useImagesHookInterface {
@@ -68,6 +70,8 @@ function useImages() : useImagesHookInterface {
   const [purple, setPurple] = useImage(purpleImage);
   const [magenta, setMagenta] = useImage(magentaImage);
   const [pink, setPink] = useImage(pinkImage);
+
+  const [disableColorPalette, setDisableColorPalette] = useState<ColorType[]>([]);
 
   function setImage(key : ColorType, image: HTMLImageElement) {
     // get the 32 from useFromImageToImages
@@ -120,10 +124,19 @@ function useImages() : useImagesHookInterface {
     }
   }
 
+  function removeColor(key : ColorType) {
+    if(disableColorPalette.length >= 12 ){
+      return;
+    }
+    setDisableColorPalette([...disableColorPalette, key]);
+  }
 
+  function restorePaletteImages() {
+    setDisableColorPalette([]);
+  }
 
-  return {
-    paletteImages: [
+  function computePaletteImages() : paletteImage[] {
+    const defaultPaletteImage : paletteImage[] = [
       { name: "black", color: { red: 0, green: 0, blue: 0 }, sprite: black },
       { name: "white", color: { red: 255, green: 255, blue: 255 }, sprite: white },
 
@@ -142,8 +155,18 @@ function useImages() : useImagesHookInterface {
       { name: "purple",  color: { red: 128, green: 0, blue: 255 }, sprite: purple },
       { name: "magenta",  color: { red: 255, green: 0, blue: 255 }, sprite: magenta },
       { name: "pink",  color: { red: 255, green: 0, blue: 128 }, sprite: pink }
-    ],
-    setPaletteImage: setImage
+    ];
+
+    return defaultPaletteImage.filter(paletteImage => !disableColorPalette.includes(paletteImage.name));
+  }
+
+
+
+  return {
+    paletteImages: computePaletteImages(),
+    setPaletteImage: setImage,
+    removeColor,
+    restorePaletteImages
   };
 }
 

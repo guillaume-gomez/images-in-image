@@ -28,27 +28,8 @@ function App() {
   const anchorRef = useRef<HTMLAnchorElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const { paletteImages, setPaletteImage } = useImages();
-
-  const picturesData = [
-    { color: { red: 0, green: 0, blue: 0 }, sprite: paletteImages[0].sprite},
-    { color: { red: 255, green: 255, blue: 255 }, sprite: paletteImages[1].sprite},
-
-    { color: { red: 255, green: 0, blue: 0}, sprite: paletteImages[2].sprite },
-    { color: { red: 255, green: 128, blue: 0}, sprite: paletteImages[3].sprite },
-    { color: { red: 255, green: 255, blue: 0}, sprite: paletteImages[4].sprite },
-
-    { color: { red: 128, green: 255, blue: 0}, sprite: paletteImages[5].sprite },
-    { color: { red: 0, green: 255, blue: 0}, sprite: paletteImages[6].sprite },
-    { color: { red: 0, green: 255, blue: 80}, sprite: paletteImages[7].sprite },
-    { color: { red: 0, green: 255, blue: 255}, sprite: paletteImages[8].sprite },
-    { color: { red: 0, green: 128, blue: 255}, sprite: paletteImages[9].sprite },
-    { color: { red: 0, green: 0, blue: 255}, sprite: paletteImages[10].sprite },
-    { color: { red: 128, green: 0, blue: 255}, sprite: paletteImages[11].sprite },
-    { color: { red: 255, green: 0, blue: 255}, sprite: paletteImages[12].sprite },
-    { color: { red: 255, green: 0, blue: 128}, sprite: paletteImages[13].sprite }
-  ];
-  const { generateImage, optimizedGenerateImage } = useFromImageToImages({picturesData, dominantImageSize: 32});
+  const { paletteImages, setPaletteImage, removeColor, restorePaletteImages } = useImages();
+  const { generateImage, optimizedGenerateImage } = useFromImageToImages({picturesData: paletteImages, dominantImageSize: 32});
 
   const {
     computePossibleSize,
@@ -61,16 +42,13 @@ function App() {
     setRatio,
     bestProportion,
     setBestProportion,
-    truncateBy,
-    setTruncateBy
   } = useImageSizes(32);
 
   useEffect(() => {
-    console.log("ratio changed ", ratio)
     if(image) {
       computePossibleSize(image.width, image.height);
     }
-  }, [image, allowResize, bestProportion, ratio, truncateBy])
+  }, [image, allowResize, bestProportion, ratio])
 
   function moveTo(id: string) {
     const element = document.getElementById(id);
@@ -174,7 +152,8 @@ function App() {
                 nextButtonText="Next 👉"
                 onClick={() => moveTo("algorithm")}
               >
-                { paletteImages.map(paletteImage => {
+                <button className="btn btn-secondary" onClick={restorePaletteImages}>Restore default palette images</button>
+                { paletteImages.map((paletteImage, index) => {
                     return (
                     <div key={paletteImage.name} className="flex flex-col gap-2">
                       <label className="flex flex-row gap-1">
@@ -188,6 +167,7 @@ function App() {
                           }}
                         >
                         </span>
+                        <button className="btn btn-danger" onClick={() => removeColor(paletteImage.name)}>Delete</button>
                       </label>
                       <InputFileWithPreview onChange={(image) => {setPaletteImage(paletteImage.name, image) }} value={paletteImage.sprite} />
                     </div>)
@@ -220,19 +200,6 @@ function App() {
                             value={allowResize}
                             toggle={() => setAllowResize(!allowResize)}
                           />
-                          <div>
-                            <label>Truncate by</label>
-                            <input
-                              disabled={!allowResize}
-                              type="range"
-                              min={2}
-                              max={10}
-                              value={truncateBy}
-                              onChange={(e) => setTruncateBy(parseInt(e.target.value))}
-                              className={`range ${allowResize ? "range-primary" : "range-error" }`}
-                              />
-                            <span>{truncateBy}</span>
-                          </div>
                           <Toggle
                             label="Best proportion"
                             value={bestProportion}
