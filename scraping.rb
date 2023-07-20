@@ -2,7 +2,8 @@ require 'httparty'
 
 def fromArrayToJavascriptString(array)
     array_string = array.map do |item|
-        shots_without_backslash = item[:shots].to_s.gsub("\"", "'")
+        shots_with_return = item[:shots].to_s
+        shots_without_backslash = shots_with_return.gsub("\"", "'")
         "{ color: '##{item[:color]}', shots: #{shots_without_backslash} }"
     end
 
@@ -33,27 +34,30 @@ def main
 
 
     paletteColors = [
-        black,
-        white,
-        red,
-        orange,
-        yellow,
-        light_green,
-        green,
-        dark_green,
-        cyan,
-        light_blue,
-        blue,
-        purple,
-        magenta,
-        pink
+        { name: "black", color: black },
+        { name: "white", color: white },
+        #{ name: "red", color: red },
+        #{ name: "orange", color: orange },
+        #{ name: "yellow", color: yellow },
+        #{ name: "light_green", color: light_green },
+        #{ name: "green", color: green },
+        #{ name: "dark_green", color: dark_green },
+        #{ name: "cyan", color: cyan },
+        #{ name: "light_blue", color: light_blue },
+        #{ name: "blue", color: blue },
+        #{ name: "purple", color: purple },
+        #{ name: "magenta", color: magenta },
+        #{ name: "pink", color: pink }
     ]
     colors_result = []
 
     headers = {
         'x-requested-with': 'XMLHttpRequest'
     }
-    paletteColors.each do |hex_color|
+    paletteColors.each do |color_information|
+        hex_color = color_information[:color]
+        color_name = color_information[:name]
+
         puts "url https://dribbble.com/colors/for_404.json?hex=#{hex_color}"
         response = HTTParty.get(
             "https://dribbble.com/colors/for_404.json?hex=#{hex_color}",
@@ -61,13 +65,15 @@ def main
         )
         #puts response.code
         # 200
-        colors_result << { shots: parseShots(response.body), color: hex_color }
+        colors_result << { shots: parseShots(response.body), color: hex_color, name: color_name }
         sleep(1)
     end
     colors_result
 end
 
 
-string = fromArrayToJavascriptString(main).to_s.gsub('"{', '{').gsub('"}', '}')
+string = fromArrayToJavascriptString(main).to_s.gsub('"{', '{').gsub('}"', '}')
 
-File.write("log.js", "const results = #{string};")
+File.open("src/Generated/dribblePalette.ts", "w") do |f|
+  f.write "export const dribblePalette = #{string};"
+end
