@@ -146,7 +146,7 @@ function useImages() : useImagesHookInterface {
 
       { name: "light-green", color: { red: 128, green: 255, blue: 0}, sprite: lightGreen },
       { name: "green", color: { red: 0, green: 255, blue: 0}, sprite: green },
-      { name: "dark-green", color: { red: 0, green: 255, blue: 80}, sprite: darkGreen },
+      { name: "dark-green", color: { red: 40, green: 80, blue: 0}, sprite: darkGreen },
 
       { name: "cyan",  color: { red: 0, green: 255, blue: 255 }, sprite: cyan },
       { name: "light-blue",  color: { red: 0, green: 128, blue: 255 }, sprite: lightBlue },
