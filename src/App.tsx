@@ -8,6 +8,7 @@ import InputFileWithPreview from "./Components/InputFileWithPreview";
 import Toggle from "./Components/Toggle";
 import sampleImage from "./image.png";
 import { resizeImageCanvas, fromColorArrayToStringCSS } from "./tools";
+import useRandomImage from "./Hooks/useRandomImage";
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -43,6 +44,8 @@ function App() {
     bestProportion,
     setBestProportion,
   } = useImageSizes(32);
+
+  const result = useRandomImage("#FF0099");
 
   useEffect(() => {
     if(image) {
