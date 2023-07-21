@@ -36,18 +36,18 @@ def main
     paletteColors = [
         { name: "black", color: black },
         { name: "white", color: white },
-        #{ name: "red", color: red },
-        #{ name: "orange", color: orange },
-        #{ name: "yellow", color: yellow },
-        #{ name: "light_green", color: light_green },
-        #{ name: "green", color: green },
-        #{ name: "dark_green", color: dark_green },
-        #{ name: "cyan", color: cyan },
-        #{ name: "light_blue", color: light_blue },
-        #{ name: "blue", color: blue },
-        #{ name: "purple", color: purple },
-        #{ name: "magenta", color: magenta },
-        #{ name: "pink", color: pink }
+        { name: "red", color: red },
+        { name: "orange", color: orange },
+        { name: "yellow", color: yellow },
+        { name: "light_green", color: light_green },
+        { name: "green", color: green },
+        { name: "dark_green", color: dark_green },
+        { name: "cyan", color: cyan },
+        { name: "light_blue", color: light_blue },
+        { name: "blue", color: blue },
+        { name: "purple", color: purple },
+        { name: "magenta", color: magenta },
+        { name: "pink", color: pink }
     ]
     colors_result = []
 
