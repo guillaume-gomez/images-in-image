@@ -52,24 +52,24 @@ interface useImagesHookInterface {
 }
 
 function useImages() : useImagesHookInterface {
-  const [black, setBlack] = useImage(blackImage);
-  const [white, setWhite] = useImage(whiteImage);
+  const [black, setBlack, loadBlack] = useImage(blackImage);
+  const [white, setWhite, loadWhite] = useImage(whiteImage);
 
-  const [red, setRed] = useImage(redImage);
-  const [orange, setOrange] = useImage(orangeImage);
-  const [yellow, setYellow] = useImage(yellowImage);
+  const [red, setRed, loadRed] = useImage(redImage);
+  const [orange, setOrange, loadOrange] = useImage(orangeImage);
+  const [yellow, setYellow, loadYellow] = useImage(yellowImage);
 
-  const [lightGreen, setLightGreen] = useImage(lightGreenImage);
-  const [green, setGreen] = useImage(greenImage);
-  const [darkGreen, setDarkGreen] = useImage(darkGreenImage);
+  const [lightGreen, setLightGreen, loadLightGreen] = useImage(lightGreenImage);
+  const [green, setGreen, loadGreen] = useImage(greenImage);
+  const [darkGreen, setDarkGreen, loadDarkGreen] = useImage(darkGreenImage);
 
-  const [cyan, setCyan] = useImage(cyanImage);
-  const [lightBlue, setLightBlue] = useImage(lightBlueImage);
-  const [blue, setBlue] = useImage(blueImage);
+  const [cyan, setCyan, loadCyan] = useImage(cyanImage);
+  const [lightBlue, setLightBlue, loadLightBlue] = useImage(lightBlueImage);
+  const [blue, setBlue, loadBlue] = useImage(blueImage);
 
-  const [purple, setPurple] = useImage(purpleImage);
-  const [magenta, setMagenta] = useImage(magentaImage);
-  const [pink, setPink] = useImage(pinkImage);
+  const [purple, setPurple, loadPurple] = useImage(purpleImage);
+  const [magenta, setMagenta, loadMagenta] = useImage(magentaImage);
+  const [pink, setPink, loadPink] = useImage(pinkImage);
 
   const [disableColorPalette, setDisableColorPalette] = useState<ColorType[]>([]);
 
@@ -132,6 +132,21 @@ function useImages() : useImagesHookInterface {
   }
 
   function restorePaletteImages() {
+    loadBlack(blackImage);
+    loadWhite(whiteImage);
+
+    loadRed(redImage);
+    loadOrange(orangeImage);
+    loadYellow(yellowImage);
+
+    loadCyan(cyanImage);
+    loadLightBlue(lightBlueImage);
+    loadBlue(blueImage);
+
+    loadPurple(purpleImage);
+    loadMagenta(magentaImage);
+    loadPink(pinkImage);
+
     setDisableColorPalette([]);
   }
 
