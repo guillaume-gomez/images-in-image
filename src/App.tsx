@@ -8,7 +8,7 @@ import InputFileWithPreview from "./Components/InputFileWithPreview";
 import Toggle from "./Components/Toggle";
 import sampleImage from "./image.png";
 import { resizeImageCanvas, fromColorArrayToStringCSS } from "./tools";
-import useRandomImage from "./Hooks/useRandomImage";
+
 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
@@ -29,7 +29,7 @@ function App() {
   const anchorRef = useRef<HTMLAnchorElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const { paletteImages, setPaletteImage, removeColor, restorePaletteImages } = useImages();
+  const { paletteImages, setPaletteImage, removeColor, restorePaletteImages, computeRandomPalette } = useImages();
   const { generateImage, optimizedGenerateImage } = useFromImageToImages({picturesData: paletteImages, dominantImageSize: 32});
 
   const {
@@ -44,8 +44,6 @@ function App() {
     bestProportion,
     setBestProportion,
   } = useImageSizes(32);
-
-  const result = useRandomImage("#FF0099");
 
   useEffect(() => {
     if(image) {
@@ -155,7 +153,10 @@ function App() {
                 nextButtonText="Next 👉"
                 onClick={() => moveTo("algorithm")}
               >
-                <button className="btn btn-secondary" onClick={restorePaletteImages}>Restore default palette images</button>
+                <div className="flex gap-3">
+                  <button className="btn btn-secondary" onClick={restorePaletteImages}>Restore default palette images</button>
+                  <button className="btn btn-accent" onClick={computeRandomPalette}>Use random Palette</button>
+                </div>
                 { paletteImages.map((paletteImage, index) => {
                     return (
                     <div key={paletteImage.name} className="flex flex-col gap-2">

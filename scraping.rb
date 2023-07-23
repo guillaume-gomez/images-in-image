@@ -4,7 +4,7 @@ def fromArrayToJavascriptString(array)
     array_string = array.map do |item|
         shots_with_return = item[:shots].to_s
         shots_without_backslash = shots_with_return.gsub("\"", "'")
-        "{ color: '##{item[:color]}', shots: #{shots_without_backslash} }"
+        "{ color: '##{item[:color]}', name: '#{item[:name]}', shots: #{shots_without_backslash} }"
     end
 
     array_string
@@ -32,18 +32,18 @@ def main
     magenta = "FF00FF"
     pink = "FF0080"
 
-
+    # naming coming from ColorType (in utils.ts)
     paletteColors = [
         { name: "black", color: black },
         { name: "white", color: white },
         { name: "red", color: red },
         { name: "orange", color: orange },
         { name: "yellow", color: yellow },
-        { name: "light_green", color: light_green },
+        { name: "light-green", color: light_green },
         { name: "green", color: green },
-        { name: "dark_green", color: dark_green },
+        { name: "dark-green", color: dark_green },
         { name: "cyan", color: cyan },
-        { name: "light_blue", color: light_blue },
+        { name: "light-blue", color: light_blue },
         { name: "blue", color: blue },
         { name: "purple", color: purple },
         { name: "magenta", color: magenta },
@@ -65,7 +65,7 @@ def main
         )
         #puts response.code
         # 200
-        colors_result << { shots: parseShots(response.body), color: hex_color, name: color_name }
+        colors_result << { color: hex_color, name: color_name, shots: parseShots(response.body) }
         sleep(1)
     end
     colors_result
@@ -74,6 +74,12 @@ end
 
 string = fromArrayToJavascriptString(main).to_s.gsub('"{', '{').gsub('}"', '}')
 
+multiline = %Q(import { DribblePalette } from "../types";
+
+  export const dribblePalette : DribblePalette[] = #{string};
+)
+
+
 File.open("src/Generated/dribblePalette.ts", "w") do |f|
-  f.write "export const dribblePalette = #{string};"
+  f.write "#{multiline}"
 end
