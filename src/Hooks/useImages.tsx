@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import { useState } from 'react';
 import { resizeImage } from "../tools";
 import { Color } from "../types";
 import useImage from "./useImage";

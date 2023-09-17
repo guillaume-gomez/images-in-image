@@ -6,7 +6,6 @@ import useImageSizes from "./Hooks/useImageSizes";
 import StepFormCard from "./Components/StepFormCard";
 import InputFileWithPreview from "./Components/InputFileWithPreview";
 import Toggle from "./Components/Toggle";
-import sampleImage from "./image.png";
 import { resizeImageCanvas, fromColorArrayToStringCSS } from "./tools";
 
 import Header from "./Components/Header";
@@ -21,12 +20,10 @@ function App() {
   const [image, setImage] = useState<HTMLImageElement>();
   const [error, setError] = useState<string>("");
   const [fullscreen, setFullscreen] = useState<boolean>(false);
-  const [pendingSave, setPendingSave] = useState<boolean>(false);
 
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const canvasPreview = useRef<HTMLCanvasElement>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
 
   const { paletteImages, setPaletteImage, removeColor, restorePaletteImages } = useImages();
   const { generateImage, optimizedGenerateImage } = useFromImageToImages({picturesData: paletteImages, dominantImageSize: 32});
