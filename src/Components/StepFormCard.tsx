@@ -18,7 +18,7 @@ function StepFormCard({ id, children, stepNumber, title, nextButtonText, onClick
         </div>
       </div>
       <div className="card-body">
-        <h2 className="card-title">{title}</h2>
+        <h2 className="card-title -mt-3 -ml-5 text-2xl">{title}</h2>
         {children}
         {
           nextButtonText ?
