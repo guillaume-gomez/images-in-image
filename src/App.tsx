@@ -153,19 +153,21 @@ function App() {
                 { paletteImages.map((paletteImage, index) => {
                     return (
                     <div key={paletteImage.name} className="flex flex-col gap-2">
-                      <label className="flex flex-row gap-1">
-                        {paletteImage.name}
-                        <span
-                          className="p-3"
-                          style={{
-                            border: "1px solid black",
-                            borderRadius: "6px",
-                            background: fromColorArrayToStringCSS(paletteImage.color)
-                          }}
-                        >
-                        </span>
-                        <button className="btn btn-danger" onClick={() => removeColor(paletteImage.name)}>Delete</button>
-                      </label>
+                        <div className="badge badge-primary badge-outline h-full p-2">
+                          <label className="bold flex gap-2 items-center font-bold">
+                            {paletteImage.name}
+                            <span
+                              className="p-3"
+                              style={{
+                                border: "1px solid black",
+                                borderRadius: "6px",
+                                background: fromColorArrayToStringCSS(paletteImage.color)
+                              }}
+                            >
+                            </span>
+                            <button className="btn btn-danger btn-xs" onClick={() => removeColor(paletteImage.name)}>Delete</button>
+                          </label>
+                        </div>
                       <InputFileWithPreview onChange={(image) => {setPaletteImage(paletteImage.name, image) }} value={paletteImage.sprite} />
                     </div>)
                 })
