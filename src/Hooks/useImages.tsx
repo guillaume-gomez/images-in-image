@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { resizeImage } from "../tools";
 import { Color } from "../types";
 import useImage from "./useImage";
+import { sample } from "lodash";
+
+import { dribblePalette } from "../Generated/dribblePalette";
 
 import blackImage from "../Sprites/black.png";
 import whiteImage from "../Sprites/white.png";
@@ -21,22 +24,8 @@ import purpleImage from "../Sprites/purple.png";
 import magentaImage from "../Sprites/magenta.png";
 import pinkImage from "../Sprites/pink.png";
 
+import { ColorType } from "../types";
 
-
-type ColorType = "black"      |
-                 "white"      |
-                 "red"        |
-                 "orange"     |
-                 "yellow"     |
-                 "light-green"|
-                 "green"      |
-                 "dark-green" |
-                 "cyan"       |
-                 "light-blue" |
-                 "blue"       |
-                 "purple"     |
-                 "magenta"    |
-                 "pink";
 
 interface paletteImage {
   color: Color;
@@ -49,6 +38,7 @@ interface useImagesHookInterface {
   setPaletteImage: (key : ColorType, image: HTMLImageElement) => void;
   removeColor: (key : ColorType) => void;
   restorePaletteImages: () => void;
+  computeRandomPalette: () => void;
 }
 
 function useImages() : useImagesHookInterface {
@@ -75,7 +65,6 @@ function useImages() : useImagesHookInterface {
 
   function setImage(key : ColorType, image: HTMLImageElement) {
     // get the 32 from useFromImageToImages
-    // TODO RESIZE IMAGE BEFORE SAVING
     const resizedImage = resizeImage(image, 32, 32)
     switch(key) {
       default:
@@ -150,6 +139,47 @@ function useImages() : useImagesHookInterface {
     setDisableColorPalette([]);
   }
 
+  function randomDribbleImage(colorType: ColorType) {
+    const dribbleImagesByColorType = dribblePalette.find(dribblePaletteColor => dribblePaletteColor.name === colorType);
+    if(!dribbleImagesByColorType){
+      return;
+    }
+
+    const url = sample(dribbleImagesByColorType.shots);
+    const image  = new Image();
+    if(!url) {
+      return;
+    }
+    image.src = url;
+    image.crossOrigin="anonymous";
+    image.onload = () =>{
+      console.log(image);
+      setImage(colorType, image);
+    }
+
+  }
+
+  function computeRandomPalette() {
+    randomDribbleImage("black");
+    randomDribbleImage("white");
+
+    randomDribbleImage("red");
+    randomDribbleImage("orange");
+    randomDribbleImage("yellow");
+
+    randomDribbleImage("light-green");
+    randomDribbleImage("green");
+    randomDribbleImage("dark-green");
+
+    randomDribbleImage("cyan");
+    randomDribbleImage("light-blue");
+    randomDribbleImage("blue");
+
+    randomDribbleImage("purple");
+    randomDribbleImage("magenta");
+    randomDribbleImage("pink");
+  }
+
   function computePaletteImages() : paletteImage[] {
     const defaultPaletteImage : paletteImage[] = [
       { name: "black", color: { red: 0, green: 0, blue: 0 }, sprite: black },
@@ -161,7 +191,7 @@ function useImages() : useImagesHookInterface {
 
       { name: "light-green", color: { red: 128, green: 255, blue: 0}, sprite: lightGreen },
       { name: "green", color: { red: 0, green: 255, blue: 0}, sprite: green },
-      { name: "dark-green", color: { red: 0, green: 255, blue: 80}, sprite: darkGreen },
+      { name: "dark-green", color: { red: 40, green: 80, blue: 0}, sprite: darkGreen },
 
       { name: "cyan",  color: { red: 0, green: 255, blue: 255 }, sprite: cyan },
       { name: "light-blue",  color: { red: 0, green: 128, blue: 255 }, sprite: lightBlue },
@@ -181,7 +211,8 @@ function useImages() : useImagesHookInterface {
     paletteImages: computePaletteImages(),
     setPaletteImage: setImage,
     removeColor,
-    restorePaletteImages
+    restorePaletteImages,
+    computeRandomPalette
   };
 }
 
