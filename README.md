@@ -1,4 +1,4 @@
-# images in image
+# Images in image
 
 the purpose of this tool is to generate images based on palette of images
 
