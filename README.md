@@ -1,3 +1,7 @@
+# images in image
+
+the purpose of this tool is to generate images based on palette of images
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
