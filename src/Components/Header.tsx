@@ -8,7 +8,7 @@ function Header() {
         style={{border: "1px solid black"}}
         width="64px"
       />
-      <a className="btn btn-ghost normal-case text-xl">Images in Image</a>
+      <a className="text-2xl font-bold">Images in Image</a>
     </div>
   );
 }
