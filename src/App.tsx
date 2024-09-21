@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { format as formatFns } from "date-fns";
 import useImages from "./Hooks/useImages";
+import useImageContrast from "./Hooks/useImageContrast";
 import useFromImageToImages from "./Hooks/useFromImageToImages";
 import useImageSizes from "./Hooks/useImageSizes";
 import StepFormCard from "./Components/StepFormCard";
@@ -20,10 +21,12 @@ function App() {
   const [algorithmType, setAlgorithmType] = useState<AlgorithmType>("optimized");
   const [image, setImage] = useState<HTMLImageElement>();
   const [error, setError] = useState<string>("");
+  const [chooseContrastedImage, setChooseContrastedImage] = useState<boolean>(true);
   const [fullscreen, setFullscreen] = useState<boolean>(false);
 
   const canvasFinal = useRef<HTMLCanvasElement>(null);
   const canvasPreview = useRef<HTMLCanvasElement>(null);
+  const canvasContrast = useRef<HTMLCanvasElement>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
 
   const { paletteImages, setPaletteImage, removeColor, restorePaletteImages, computeRandomPalette } = useImages();
@@ -42,11 +45,19 @@ function App() {
     setBestProportion,
   } = useImageSizes(32);
 
+  const { contrastedImage, computeImage } = useImageContrast();
+
   useEffect(() => {
     if(image) {
       computePossibleSize(image.width, image.height);
     }
-  }, [image, allowResize, bestProportion, ratio])
+  }, [image, allowResize, bestProportion, ratio]);
+
+  useEffect(() => {
+    if(image && canvasContrast.current) {
+      computeImage(image, canvasContrast.current);
+    }
+  }, [image]);
 
   function moveTo(id: string) {
     const element = document.getElementById(id);
@@ -73,11 +84,16 @@ function App() {
       setError("Error! Please upload an image");
       moveTo("choose-image");
     }
-    if(image && canvasFinal.current && canvasPreview.current) {
+    if(!contrastedImage) {
+      setError("Contrasted image is not fully generated");
+    }
+
+    if(image && contrastedImage && canvasFinal.current && canvasPreview.current) {
+      const imageChoosed = chooseContrastedImage ? contrastedImage : image;
       if(algorithmType === "optimized") {
-        optimizedGenerateImage(image, canvasFinal.current, possibleWidth, possibleHeight);
+        optimizedGenerateImage(imageChoosed, canvasFinal.current, possibleWidth, possibleHeight);
       } else {
-        generateImage(image, canvasFinal.current);
+        generateImage(imageChoosed, canvasFinal.current);
       }
       // generate preview
       resizeImageCanvas(canvasFinal.current, canvasPreview.current, canvasFinal.current.width, canvasFinal.current.height);
@@ -142,6 +158,7 @@ function App() {
                   : <></>
                 }
                 <InputFileWithPreview onChange={uploadImage} value={image} />
+                <canvas ref={canvasContrast}  style={{display: "none"}}/>
               </StepFormCard>
               <StepFormCard
                 id="custom-palette"
@@ -194,6 +211,11 @@ function App() {
                     <option key="2" value="biggestImage"> Biggest Image</option>
                 </select>
                 <div>
+                  <Toggle
+                    label="Use contrast (improve result in most of time)"
+                    value={chooseContrastedImage}
+                    toggle={() => setChooseContrastedImage(!chooseContrastedImage)}
+                  />
                   {
                     algorithmType === "optimized" ?
                       (
